@@ -26,8 +26,8 @@ import axios from "axios";
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("sdfsdf");
-  const [apiError, setApiError] = useState('');
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [apiStatus, setApiStatus] = useState("");
 
   const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ const Login = () => {
     validationSchema,
     onSubmit: (values) => {
       login(values);
-      //   setShowAlert(true);
+      setShowAlert(true);
       //   setAlertMessage("Hello world");
     },
   });
@@ -56,14 +56,15 @@ const Login = () => {
     axios
       .post("http://localhost:4000/api/login", userInfo)
       .then((res) => {
-        console.log(res.data.success);
         if (res.data.success) {
+          setApiStatus("Logged In Successfully");
+          setAlertMessage("Logged In Successfully");
           navigate("/web/dashboard");
         }
       })
       .catch((error) => {
-        // console.log(error.response.data);
-        setApiError(error.response.data.msg)
+        setApiStatus(error.response.data.msg);
+        setAlertMessage(error.response.data.msg);
       });
   };
 
@@ -87,24 +88,29 @@ const Login = () => {
                       </CAlert>
                     )}
                     {/* <button onClick={handleClick}>Open simple snackbar</button> */}
-                    <Snackbar
-                      open={true}
-                      autoHideDuration={60}
-                      message={apiError}
-                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                      action={
-                        <React.Fragment>
-                          <IconButton
-                            aria-label="close"
-                            color="inherit"
-                            sx={{ p: 0.5 }}
-                            onClick={() => console.log("close snackbar")}
-                          >
-                            <CloseIcon />
-                          </IconButton>
-                        </React.Fragment>
-                      }
-                    />
+                    {apiStatus && (
+                      <Snackbar
+                        open={true}
+                        autoHideDuration={6000}
+                        message={apiStatus}
+                        anchorOrigin={{
+                          horizontal: "right",
+                          vertical: "bottom",
+                        }}
+                        action={
+                          <React.Fragment>
+                            <IconButton
+                              aria-label="close"
+                              color="inherit"
+                              sx={{ p: 0.5 }}
+                              onClick={() => console.log("close snackbar")}
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          </React.Fragment>
+                        }
+                      />
+                    )}
                     <CForm onSubmit={loginForm.handleSubmit}>
                       <h1>Login</h1>
                       <p className="text-medium-emphasis">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CAlert } from "@coreui/react";
 import * as Yup from "yup";
 import Snackbar from "@mui/material/Snackbar";
@@ -26,8 +26,10 @@ import axios from "axios";
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("sdfsdf");
-  // const [] = useState("");
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [apiStatus, setApiStatus] = useState("");
+
+  const navigate = useNavigate();
 
   const initialValues = {
     name: "",
@@ -49,22 +51,26 @@ const Register = () => {
     validationSchema,
     onSubmit: (values) => {
       register(values);
-      // console.log(values);
-      // setShowAlert(true);
-      // setAlertMessage("Hello world");
+      setShowAlert(true);
     },
   });
 
   //storing new user data in database
   const register = async (userInfo) => {
-    axios.post("http://localhost:4000/api/register", userInfo).then(res => {
-      // if(res.data == 'success'){
-      //   alert('Registered Successfully');
-      // }
-      console.log(res.data.msg);
-    }).catch(error => {
-      console.log(error.response.data.msg);
-    })
+    axios
+      .post("http://localhost:4000/api/register", userInfo)
+      .then((res) => {
+        if (res.data.success) {
+          setApiStatus("Registered Successfully");
+          setAlertMessage("Registered Successfully");
+          navigate("/auth/login")
+        }
+        setAlertMessage("");
+      })
+      .catch((error) => {
+        setApiStatus(error.response.data.msg);
+        setAlertMessage(error.response.data.msg);
+      });
   };
 
   return (
@@ -83,28 +89,36 @@ const Register = () => {
                         dismissible
                         onClose={() => setShowAlert(false)}
                       >
-                        {alertMessage}
+                        {alertMessage && alertMessage}
                       </CAlert>
                     )}
                     {/* <button onClick={handleClick}>Open simple snackbar</button> */}
-                    <Snackbar
-                      open={true}
-                      autoHideDuration={6000}
-                      message="Note archived"
-                      anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
-                      action={
-                        <React.Fragment>
-                          <IconButton
-                            aria-label="close"
-                            color="inherit"
-                            sx={{ p: 0.5 }}
-                            onClick={() => console.log("close snackbar")}
-                          >
-                            <CloseIcon />
-                          </IconButton>
-                        </React.Fragment>
-                      }
-                    />
+                    {apiStatus && (
+                      <Snackbar
+                        open={true}
+                        color=""
+                        // onError={}
+                        style={{ background: "red" }}
+                        autoHideDuration={6000}
+                        message={apiStatus}
+                        anchorOrigin={{
+                          horizontal: "right",
+                          vertical: "bottom",
+                        }}
+                        action={
+                          <React.Fragment>
+                            <IconButton
+                              aria-label="close"
+                              color="inherit"
+                              sx={{ p: 0.5 }}
+                              onClick={() => console.log("close snackbar")}
+                            >
+                              <CloseIcon />
+                            </IconButton>
+                          </React.Fragment>
+                        }
+                      />
+                    )}
                     <CForm onSubmit={loginForm.handleSubmit}>
                       <h1>Register</h1>
                       <p className="text-medium-emphasis">Create new account</p>
@@ -202,11 +216,6 @@ const Register = () => {
                             Register
                           </CButton>
                         </CCol>
-                        {/* <CCol xs={6} className="text-right">
-                          <Link className="px-0" to={"/auth/forgot"}>
-                            Forgot Password?
-                          </Link>
-                        </CCol> */}
                       </CRow>
                     </CForm>
                   </CCardBody>
