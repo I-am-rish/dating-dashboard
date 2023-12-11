@@ -19,10 +19,16 @@ import {
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useFormik } from "formik";
 import axios from "axios";
+import { IconButton, Snackbar } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Forgot = () => {
   const [alertMessage, setAlertMessage] = useState();
   const [showAlert, setShowAlert] = useState(false);
+  const [apiSuccess, setApiSuccess] = useState("");
+  const [apiError, setApiError] = useState("");
+  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
+
   const navigate = useNavigate();
   const initialValues = {
     email: "",
@@ -36,6 +42,7 @@ const Forgot = () => {
     validationSchema,
     onSubmit: (values) => {
       //   alert("hello");
+      window.localStorage.setItem("email", JSON.stringify(values));
       sendOTP(values);
       // setAlertMessage("Hello world");
     },
@@ -45,17 +52,17 @@ const Forgot = () => {
     axios
       .post("http://localhost:4000/api/password/forget", email)
       .then((res) => {
-        console.log(res.data);
         if (res.data.success) {
           setAlertMessage("Email sent to Your Email");
-          setShowAlert(true);
+          setApiSuccess("Email sent to Your Email");
+          setCloseSnakeBar(true);
           navigate("/auth/reset");
         }
       })
       .catch((error) => {
-        console.log(error);
+        setApiError(error.response.data.msg);
         setAlertMessage(error.response.data.msg);
-        setShowAlert(true);
+        setCloseSnakeBar(true);
       });
   };
 
@@ -67,15 +74,33 @@ const Forgot = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  {showAlert && (
-                    <CAlert
-                      color="warning"
-                      dismissible
-                      onClose={() => setShowAlert(false)}
-                    >
-                      {alertMessage}
-                    </CAlert>
-                  )}
+                  <Snackbar
+                    open={closeSnakeBar}
+                    autoHideDuration={1000}
+                    message={alertMessage}
+                    color="red"
+                    ContentProps={{
+                      sx: apiSuccess
+                        ? { color: "green", backgroundColor: "gray" }
+                        : { color: "red", backgroundColor: "gray" },
+                    }}
+                    anchorOrigin={{
+                      horizontal: "right",
+                      vertical: "bottom",
+                    }}
+                    action={
+                      <React.Fragment>
+                        <IconButton
+                          aria-label="close"
+                          color="inherit"
+                          sx={{ p: 0.5 }}
+                          onClick={() => setCloseSnakeBar(false)}
+                        >
+                          <CloseIcon />
+                        </IconButton>
+                      </React.Fragment>
+                    }
+                  />
                   <CForm onSubmit={loginForm.handleSubmit}>
                     <h1>Forgot Password</h1>
                     <p className="text-medium-emphasis">
@@ -94,6 +119,7 @@ const Forgot = () => {
                         placeholder="Email"
                         // autoComplete="username"
                         onChange={loginForm.handleChange}
+                        onClick={() => setCloseSnakeBar(false)}
                         value={loginForm.values.email}
                       />
                       {loginForm.errors.email && loginForm.touched.email && (

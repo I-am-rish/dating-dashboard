@@ -27,7 +27,9 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
-  const [apiStatus, setApiStatus] = useState("");
+  const [apiSuccess, setApiSuccess] = useState("");
+  const [apiError, setApiError] = useState("");
+  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
 
   const navigate = useNavigate();
 
@@ -47,8 +49,6 @@ const Login = () => {
     validationSchema,
     onSubmit: (values) => {
       login(values);
-      setShowAlert(true);
-      //   setAlertMessage("Hello world");
     },
   });
 
@@ -57,14 +57,16 @@ const Login = () => {
       .post("http://localhost:4000/api/login", userInfo)
       .then((res) => {
         if (res.data.success) {
-          setApiStatus("Logged In Successfully");
+          setApiSuccess("Logged In Successfully");
           setAlertMessage("Logged In Successfully");
+          setCloseSnakeBar(true);
           navigate("/web/dashboard");
         }
       })
       .catch((error) => {
-        setApiStatus(error.response.data.msg);
-        setAlertMessage(error.response.data.msg);
+        setApiError(error.response.data.message);
+        setAlertMessage(error.response.data.message);
+        setCloseSnakeBar(true);
       });
   };
 
@@ -78,39 +80,36 @@ const Login = () => {
               <CCardGroup>
                 <CCard className="p-4">
                   <CCardBody>
-                    {showAlert && (
-                      <CAlert
-                        color="warning"
-                        dismissible
-                        onClose={() => setShowAlert(false)}
-                      >
-                        {alertMessage}
-                      </CAlert>
-                    )}
-                    {/* <button onClick={handleClick}>Open simple snackbar</button> */}
-                    {apiStatus && (
-                      <Snackbar
-                        open={true}
-                        autoHideDuration={6000}
-                        message={apiStatus}
-                        anchorOrigin={{
-                          horizontal: "right",
-                          vertical: "bottom",
-                        }}
-                        action={
-                          <React.Fragment>
-                            <IconButton
-                              aria-label="close"
-                              color="inherit"
-                              sx={{ p: 0.5 }}
-                              onClick={() => console.log("close snackbar")}
-                            >
-                              <CloseIcon />
-                            </IconButton>
-                          </React.Fragment>
-                        }
-                      />
-                    )}
+                    <Snackbar
+                      open={closeSnakeBar}
+                      autoHideDuration={1000}
+                      message={alertMessage}
+                      color="red"
+                      ContentProps={{
+                        sx: apiSuccess
+                          ? { color: "green", backgroundColor: "gray" }
+                          : { color: "red", backgroundColor: "gray" },
+                      }}
+                      // sx={{ color: "red" }}
+
+                      anchorOrigin={{
+                        horizontal: "right",
+                        vertical: "bottom",
+                      }}
+                      action={
+                        <React.Fragment>
+                          <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            sx={{ p: 0.5 }}
+                            onClick={() => setCloseSnakeBar(false)}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </React.Fragment>
+                      }
+                    />
+
                     <CForm onSubmit={loginForm.handleSubmit}>
                       <h1>Login</h1>
                       <p className="text-medium-emphasis">
@@ -128,6 +127,7 @@ const Login = () => {
                           id="email"
                           onChange={loginForm.handleChange}
                           value={loginForm.values.email}
+                          onClick={() => setCloseSnakeBar(false)}
                         />
                         {loginForm.errors.email && loginForm.touched.email && (
                           <div className="invalid-feedback">
@@ -153,6 +153,7 @@ const Login = () => {
                           id="password"
                           onChange={loginForm.handleChange}
                           value={loginForm.values.password}
+                          onClick={() => setCloseSnakeBar(false)}
                         />
                         {loginForm.errors.password &&
                           loginForm.touched.password && (
