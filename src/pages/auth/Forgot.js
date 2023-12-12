@@ -24,10 +24,9 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const Forgot = () => {
   const [alertMessage, setAlertMessage] = useState();
-  const [showAlert, setShowAlert] = useState(false);
   const [apiSuccess, setApiSuccess] = useState("");
   const [apiError, setApiError] = useState("");
-  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
+  const [openSnakeBar, setOpenSnakeBar] = useState(false);
 
   const navigate = useNavigate();
   const initialValues = {
@@ -50,19 +49,19 @@ const Forgot = () => {
 
   const sendOTP = (email) => {
     axios
-      .post("http://localhost:4000/api/password/forget", email)
+      .post("http://localhost:4000/api/password/forgot", email)
       .then((res) => {
         if (res.data.success) {
           setAlertMessage("Email sent to Your Email");
           setApiSuccess("Email sent to Your Email");
-          setCloseSnakeBar(true);
+          setOpenSnakeBar(true);
           navigate("/auth/reset");
         }
       })
       .catch((error) => {
-        setApiError(error.response.data.msg);
-        setAlertMessage(error.response.data.msg);
-        setCloseSnakeBar(true);
+        setApiError(error.response.data.message);
+        setAlertMessage(error.response.data.message);
+        setOpenSnakeBar(true);
       });
   };
 
@@ -75,7 +74,7 @@ const Forgot = () => {
               <CCard className="p-4">
                 <CCardBody>
                   <Snackbar
-                    open={closeSnakeBar}
+                    open={openSnakeBar}
                     autoHideDuration={1000}
                     message={alertMessage}
                     color="red"
@@ -94,7 +93,7 @@ const Forgot = () => {
                           aria-label="close"
                           color="inherit"
                           sx={{ p: 0.5 }}
-                          onClick={() => setCloseSnakeBar(false)}
+                          onClick={() => setOpenSnakeBar(false)}
                         >
                           <CloseIcon />
                         </IconButton>
@@ -119,7 +118,7 @@ const Forgot = () => {
                         placeholder="Email"
                         // autoComplete="username"
                         onChange={loginForm.handleChange}
-                        onClick={() => setCloseSnakeBar(false)}
+                        onClick={() => setOpenSnakeBar(false)}
                         value={loginForm.values.email}
                       />
                       {loginForm.errors.email && loginForm.touched.email && (

@@ -27,8 +27,9 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
-  const [apiStatus, setApiStatus] = useState("");
-
+  const [apiSuccess, setApiSuccess] = useState("");
+  const [apiError, setApiError] = useState("");
+  const [openSnakeBar, setOpenSnakeBar] = useState(false);
   const navigate = useNavigate();
 
   const initialValues = {
@@ -51,7 +52,7 @@ const Register = () => {
     validationSchema,
     onSubmit: (values) => {
       register(values);
-      setShowAlert(true);
+      setOpenSnakeBar(true);
     },
   });
 
@@ -61,15 +62,16 @@ const Register = () => {
       .post("http://localhost:4000/api/register", userInfo)
       .then((res) => {
         if (res.data.success) {
-          setApiStatus("Registered Successfully");
+          setApiSuccess("Registered Successfully");
           setAlertMessage("Registered Successfully");
-          navigate("/auth/login")
+          navigate("/auth/login");
         }
         setAlertMessage("");
       })
       .catch((error) => {
-        setApiStatus(error.response.data.msg);
-        setAlertMessage(error.response.data.msg);
+        console.log(error.response.data.message);
+        setApiError(true);
+        setAlertMessage(error.response.data.message);
       });
   };
 
@@ -83,24 +85,11 @@ const Register = () => {
               <CCardGroup>
                 <CCard className="p-4">
                   <CCardBody>
-                    {showAlert && (
-                      <CAlert
-                        color="warning"
-                        dismissible
-                        onClose={() => setShowAlert(false)}
-                      >
-                        {alertMessage && alertMessage}
-                      </CAlert>
-                    )}
-                    {/* <button onClick={handleClick}>Open simple snackbar</button> */}
-                    {apiStatus && (
+                    {apiSuccess && (
                       <Snackbar
                         open={true}
-                        color=""
-                        // onError={}
-                        style={{ background: "red" }}
                         autoHideDuration={6000}
-                        message={apiStatus}
+                        message={"error"}
                         anchorOrigin={{
                           horizontal: "right",
                           vertical: "bottom",
@@ -111,7 +100,7 @@ const Register = () => {
                               aria-label="close"
                               color="inherit"
                               sx={{ p: 0.5 }}
-                              onClick={() => console.log("close snackbar")}
+                              onClick={() => setOpenSnakeBar(false)}
                             >
                               <CloseIcon />
                             </IconButton>
@@ -132,6 +121,7 @@ const Register = () => {
                           id="name"
                           onChange={loginForm.handleChange}
                           value={loginForm.values.name}
+                          onClick={() => setOpenSnakeBar(false)}
                         />
                         {loginForm.errors.name && loginForm.touched.name && (
                           <div className="invalid-feedback">
@@ -152,6 +142,7 @@ const Register = () => {
                           id="email"
                           onChange={loginForm.handleChange}
                           value={loginForm.values.email}
+                          onClick={() => setOpenSnakeBar(false)}
                         />
                         {loginForm.errors.email && loginForm.touched.email && (
                           <div className="invalid-feedback">
@@ -172,6 +163,7 @@ const Register = () => {
                           id="mobile"
                           onChange={loginForm.handleChange}
                           value={loginForm.values.mobile}
+                          onClick={() => setOpenSnakeBar(false)}
                         />
                         {loginForm.errors.mobile &&
                           loginForm.touched.mobile && (
@@ -198,6 +190,7 @@ const Register = () => {
                           id="password"
                           onChange={loginForm.handleChange}
                           value={loginForm.values.password}
+                          onClick={() => setOpenSnakeBar(false)}
                         />
                         {loginForm.errors.password &&
                           loginForm.touched.password && (

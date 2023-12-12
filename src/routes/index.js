@@ -4,6 +4,8 @@ import Protected from "./Protected";
 
 import Dashboard from "../pages/authenticated/Dashboard";
 import UsersData from "../pages/authenticated/UsersData";
+import isAuthenticated from "./isAuthenticated";
+import Profile from "../pages/authenticated/Profile";
 
 const NotFound = lazy(() => import("../pages/common/NotFound"));
 
@@ -47,6 +49,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "/web",
+    // Component: isAuthenticated,
     children: [
       {
         path: "dashboard",
@@ -55,6 +58,10 @@ const routes = createBrowserRouter([
       {
         path: "users",
         Component: UsersData,
+      },
+      {
+        path: "profile",
+        Component: Profile,
       },
     ],
   },

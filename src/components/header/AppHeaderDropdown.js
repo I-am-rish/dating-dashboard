@@ -30,12 +30,12 @@ import axios from "axios";
 const AppHeaderDropdown = () => {
   const navigate = useNavigate();
 
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
     axios
       .get("http://localhost:4000/api/logout")
       .then((res) => {
-        if(res.data.success){
-          console.log(res);
+        if (res.data.success) {
+          window.cookieStore.delete({name:"token"})
           navigate("/auth/login")
         }
       })

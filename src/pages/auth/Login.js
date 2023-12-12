@@ -57,6 +57,8 @@ const Login = () => {
       .post("http://localhost:4000/api/login", userInfo)
       .then((res) => {
         if (res.data.success) {
+          const { token } = res.data;
+          window.cookieStore.set({name:"token", value:{token}})
           setApiSuccess("Logged In Successfully");
           setAlertMessage("Logged In Successfully");
           setCloseSnakeBar(true);
@@ -87,7 +89,7 @@ const Login = () => {
                       color="red"
                       ContentProps={{
                         sx: apiSuccess
-                          ? { color: "green", backgroundColor: "gray" }
+                          ? { color: "blue", backgroundColor: "gray" }
                           : { color: "red", backgroundColor: "gray" },
                       }}
                       // sx={{ color: "red" }}

@@ -6,26 +6,59 @@ import PageTitle from "../common/PageTitle";
 import { DataGrid, GridDeleteForeverIcon } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
+import { IconButton, Snackbar } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const UserData = () => {
+  const [alertMessage, setAlertMessage] = useState();
+  const [apiSuccess, setApiSuccess] = useState(false);
+  const [apiError, setApiError] = useState(false);
+  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [userCount, setUserCount] = useState(0);
   const [rows, setRows] = React.useState([]);
-  const [paginationModel, setPaginationModel] = React.useState({
-    page: 1,
-    pageSize: 2,
+  const [paginationModel, setPaginationModel] = useState({
+    page: 0,
+    pageSize: 3,
   });
-  // const rows = [
-  //   { id: 1, col1: 1, col2: "", col3: "", col4: "", col5: "", col6: "" },
-  // ];
 
   const columns = [
-    { field: "col1", headerName: "#", width: 50 },
+    { field: "col1", headerName: "#", width: 70 },
     { field: "col2", headerName: "Name", width: 150 },
     { field: "col3", headerName: "email", width: 250 },
     { field: "col4", headerName: "Phone Number", width: 150 },
-    { field: "col5", headerName: "Created Date", width: 150 },
-    { field: "col6", headerName: "Action", width: 200 },
+    { field: "col5", headerName: "Created Date", width: 170 },
+    {
+      field: "col6",
+      headerName: "Action",
+      width: 90,
+      renderCell: (params) => {
+        return (
+          <DeleteIcon onClick={(e) => handleDeleteButton(e, params.row)} />
+        );
+      },
+    },
   ];
+
+  const handleDeleteButton = (e, params) => {
+    const userId = params._id;
+    // console.log(window.cookieStore.set({ name: "ajnjn", value:"2111"}));
+    axios
+      .delete(`http://localhost:4000/api/admin/users/user/delete?id=${userId}`)
+      .then((res) => {
+        console.log(res);
+        setAlertMessage(res.data.message)
+        setApiSuccess(true)
+        setApiError(false)
+        setCloseSnakeBar(true)
+      })
+      .catch((error) => {
+        console.log(error.response.data.message);
+        setAlertMessage(error.response.data.message)
+        setApiError(true)
+        setApiSuccess(false)
+        setCloseSnakeBar(true)
+      });
+  };
 
   //fetching user information
   useEffect(() => {
@@ -34,62 +67,72 @@ const UserData = () => {
         `http://localhost:4000/api/admin/users?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`
       )
       .then((res) => {
-        // console.log(res.data.users);
-        // setUserCount(res.data.usersCount)
-        // console.log(res.data.usersCount);
+        setUserCount(res.data.usersCount);
         setRows(
           res.data.users.map((user, index) => {
-            console.log(user);
             return {
-              id: index + 1,
+              id: user._id,
               col1: index + 1,
               col2: user.name,
               col3: user.email,
               col4: user.mobile,
               col5: user.createdAt,
-              col6: actionButton,
             };
           })
         );
-        // console.log(rows);
-        // setUser(() => rows);
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error.response.data.message);
       });
   }, [paginationModel]);
-
-  function actionButton() {
-    return <p>del</p>
-  }
-
-  // var rows = user;
-  console.log(rows);
 
   return (
     <>
       <AppSidebar />
-      <div className="wrapper bg-light min-vh-100">
+      <div className="wrapper bg-light min-vh-100 m-2">
         <AppHeader />
         <h4>Users</h4>
         <CContainer>
           <PageTitle title="user management" />
+          <Snackbar
+            open={closeSnakeBar}
+            autoHideDuration={1000}
+            message={alertMessage}
+            ContentProps={{
+              sx: apiSuccess
+                ? { color: "green", backgroundColor: "gray" }
+                : { color: "red", backgroundColor: "gray" },
+            }}
+            anchorOrigin={{
+              horizontal: "right",
+              vertical: "bottom",
+            }}
+            action={
+              <React.Fragment>
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  sx={{ p: 0.5 }}
+                  onClick={() => setCloseSnakeBar(false)}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </React.Fragment>
+            }
+          />
           <DataGrid
             className=""
             rows={rows}
             columns={columns}
-            // initialState={{
-            //   pagination:{
-            //     paginationModel: {
-            //       pageSize: 2,
-            //     },
-            //   },
-            // }}
-            pageSizeOptions
+            // pageSizeOptions={[5, 10, 15]}
+            rowCount={userCount}
             disableRowSelectionOnClick
             pagination
             paginationMode="server"
+            paginationModel={paginationModel}
+            disableColumnMenu
             onPaginationModelChange={setPaginationModel}
+            // getRowId={}
           />
         </CContainer>
       </div>
