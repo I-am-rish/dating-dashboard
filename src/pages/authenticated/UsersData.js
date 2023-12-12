@@ -18,7 +18,7 @@ const UserData = () => {
   const [rows, setRows] = React.useState([]);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
-    pageSize: 3,
+    pageSize: 10,
   });
 
   const columns = [
@@ -33,30 +33,31 @@ const UserData = () => {
       width: 90,
       renderCell: (params) => {
         return (
-          <DeleteIcon onClick={(e) => handleDeleteButton(e, params.row)} />
+          <DeleteIcon
+            cursor={"pointer"}
+
+            onClick={(e) => handleDeleteButton(e, params.row)}
+          />
         );
       },
     },
   ];
 
   const handleDeleteButton = (e, params) => {
-    const userId = params._id;
-    // console.log(window.cookieStore.set({ name: "ajnjn", value:"2111"}));
+    const userId = params.id;
     axios
       .delete(`http://localhost:4000/api/admin/users/user/delete?id=${userId}`)
       .then((res) => {
-        console.log(res);
-        setAlertMessage(res.data.message)
-        setApiSuccess(true)
-        setApiError(false)
-        setCloseSnakeBar(true)
+        setAlertMessage(res.data.message);
+        setApiSuccess(true);
+        setApiError(false);
+        setCloseSnakeBar(true);
       })
       .catch((error) => {
-        console.log(error.response.data.message);
-        setAlertMessage(error.response.data.message)
-        setApiError(true)
-        setApiSuccess(false)
-        setCloseSnakeBar(true)
+        setAlertMessage(error.response.data.message);
+        setApiError(true);
+        setApiSuccess(false);
+        setCloseSnakeBar(true);
       });
   };
 
@@ -84,14 +85,14 @@ const UserData = () => {
       .catch((error) => {
         console.log(error.response.data.message);
       });
-  }, [paginationModel]);
+  }, [paginationModel, alertMessage]);
 
   return (
     <>
       <AppSidebar />
       <div className="wrapper bg-light min-vh-100 m-2">
         <AppHeader />
-        <h4>Users</h4>
+        <h4 className="">Users</h4>
         <CContainer>
           <PageTitle title="user management" />
           <Snackbar
@@ -100,7 +101,7 @@ const UserData = () => {
             message={alertMessage}
             ContentProps={{
               sx: apiSuccess
-                ? { color: "green", backgroundColor: "gray" }
+                ? { color: "green" }
                 : { color: "red", backgroundColor: "gray" },
             }}
             anchorOrigin={{
@@ -121,7 +122,6 @@ const UserData = () => {
             }
           />
           <DataGrid
-            className=""
             rows={rows}
             columns={columns}
             // pageSizeOptions={[5, 10, 15]}
@@ -132,7 +132,6 @@ const UserData = () => {
             paginationModel={paginationModel}
             disableColumnMenu
             onPaginationModelChange={setPaginationModel}
-            // getRowId={}
           />
         </CContainer>
       </div>
