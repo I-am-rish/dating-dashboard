@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CAlert } from "@coreui/react";
 import * as Yup from "yup";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
@@ -22,14 +21,15 @@ import {
 import PageTitle from "../common/PageTitle";
 import { useFormik } from "formik";
 import axios from "axios";
+import httpClient from "../../util/HttpClient";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
   const [apiSuccess, setApiSuccess] = useState("");
   const [apiError, setApiError] = useState("");
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -57,8 +57,8 @@ const Login = () => {
       .post("http://localhost:4000/api/login", userInfo)
       .then((res) => {
         if (res.data.success) {
-          const { token } = res.data;
-          window.cookieStore.set({name:"token", value:{token}})
+          //store token in local storage
+          window.localStorage.setItem("token", JSON.stringify(res.data.token));
           setApiSuccess("Logged In Successfully");
           setAlertMessage("Logged In Successfully");
           setCloseSnakeBar(true);
@@ -89,10 +89,9 @@ const Login = () => {
                       color="red"
                       ContentProps={{
                         sx: apiSuccess
-                          ? { color: "blue", backgroundColor: "gray" }
-                          : { color: "red", backgroundColor: "gray" },
+                          ? { color: "white", backgroundColor: "blue" }
+                          : { color: "white", backgroundColor: "red" },
                       }}
-                      // sx={{ color: "red" }}
 
                       anchorOrigin={{
                         horizontal: "right",

@@ -1,27 +1,12 @@
 import React from "react";
 import {
   CAvatar,
-  CBadge,
-  CButton,
   CDropdown,
   CDropdownDivider,
   CDropdownHeader,
-  CDropdownItem,
   CDropdownMenu,
   CDropdownToggle,
 } from "@coreui/react";
-// import {
-//   cilBell,
-//   cilCreditCard,
-//   cilCommentSquare,
-//   cilEnvelopeOpen,
-//   cilFile,
-//   cilLockLocked,
-//   cilSettings,
-//   cilTask,
-//   cilUser,
-// } from '@coreui/icons'
-// import CIcon from '@coreui/icons-react'
 
 import avatar8 from "./../../assets/images/avatars/8.jpg";
 import { Link, useNavigate } from "react-router-dom";
@@ -35,8 +20,8 @@ const AppHeaderDropdown = () => {
       .get("http://localhost:4000/api/logout")
       .then((res) => {
         if (res.data.success) {
-          window.cookieStore.delete({name:"token"})
-          navigate("/auth/login")
+          localStorage.removeItem("token"); //remove token from local storage
+          navigate("/auth/login");
         }
       })
       .catch((error) => {

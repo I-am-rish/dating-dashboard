@@ -2,11 +2,6 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
 import Protected from "./Protected";
 
-import Dashboard from "../pages/authenticated/Dashboard";
-import UsersData from "../pages/authenticated/UsersData";
-import isAuthenticated from "./isAuthenticated";
-import Profile from "../pages/authenticated/Profile";
-
 const NotFound = lazy(() => import("../pages/common/NotFound"));
 
 const Register = lazy(() => import("../pages/auth/Register"));
@@ -14,6 +9,9 @@ const Login = lazy(() => import("../pages/auth/Login"));
 const Forgot = lazy(() => import("../pages/auth/Forgot"));
 const Reset = lazy(() => import("../pages/auth/Reset"));
 const Home = lazy(() => import("../pages/Home"));
+const Dashboard = lazy(() => import("../pages/authenticated/Dashboard"));
+const UsersData = lazy(() => import("../pages/authenticated/UsersData"));
+const Profile = lazy(() => import("../pages/authenticated/Profile"));
 
 const routes = createBrowserRouter([
   {
@@ -23,7 +21,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "/auth",
-    Component: Protected,
+    // Component: Protected,
     children: [
       {
         path: "",
@@ -49,7 +47,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "/web",
-    // Component: isAuthenticated,
+    Component: Protected,
     children: [
       {
         path: "dashboard",
@@ -60,7 +58,7 @@ const routes = createBrowserRouter([
         Component: UsersData,
       },
       {
-        path: "profile",
+        path: "user/profile",
         Component: Profile,
       },
     ],

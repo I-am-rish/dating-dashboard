@@ -1,10 +1,11 @@
+// import { useCookies } from "react-cookie";
 import { Navigate, Outlet } from "react-router-dom";
 
 const Protected = () => {
-    if (!1) {
-        return <Navigate to={'/about'} />
-    }
-    return <Outlet />
-}
+  const token = window.localStorage.getItem("token");
+
+  if (token) return <Outlet />;
+  return <Navigate to={"/auth/login"} />;
+};
 
 export default Protected;

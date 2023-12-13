@@ -80,8 +80,8 @@ const Forgot = () => {
                     color="red"
                     ContentProps={{
                       sx: apiSuccess
-                        ? { color: "green", backgroundColor: "gray" }
-                        : { color: "red", backgroundColor: "gray" },
+                        ? {backgroundColor: "blue" }
+                        : { backgroundColor: "red" },
                     }}
                     anchorOrigin={{
                       horizontal: "right",

@@ -8,6 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import axios from "axios";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import httpClient from "../../util/HttpClient";
 
 const UserData = () => {
   const [alertMessage, setAlertMessage] = useState();
@@ -35,17 +36,17 @@ const UserData = () => {
         return (
           <DeleteIcon
             cursor={"pointer"}
-
-            onClick={(e) => handleDeleteButton(e, params.row)}
+            style={{ color: "red" }}
+            onClick={(e) => deleteSingleUser(e, params.row)}
           />
         );
       },
     },
   ];
 
-  const handleDeleteButton = (e, params) => {
+  const deleteSingleUser = (e, params) => {
     const userId = params.id;
-    axios
+    httpClient
       .delete(`http://localhost:4000/api/admin/users/user/delete?id=${userId}`)
       .then((res) => {
         setAlertMessage(res.data.message);
@@ -63,7 +64,7 @@ const UserData = () => {
 
   //fetching user information
   useEffect(() => {
-    axios
+    httpClient
       .get(
         `http://localhost:4000/api/admin/users?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`
       )
@@ -90,7 +91,7 @@ const UserData = () => {
   return (
     <>
       <AppSidebar />
-      <div className="wrapper bg-light min-vh-100 m-2">
+      <div className="wrapper bg-light min-vh-100 m-2 d-flex-column align-items-center">
         <AppHeader />
         <h4 className="">Users</h4>
         <CContainer>
@@ -101,8 +102,8 @@ const UserData = () => {
             message={alertMessage}
             ContentProps={{
               sx: apiSuccess
-                ? { color: "green" }
-                : { color: "red", backgroundColor: "gray" },
+                ? { backgroundColor: "blue" }
+                : { backgroundColor: "red" },
             }}
             anchorOrigin={{
               horizontal: "right",
@@ -124,7 +125,7 @@ const UserData = () => {
           <DataGrid
             rows={rows}
             columns={columns}
-            // pageSizeOptions={[5, 10, 15]}
+            pageSizeOptions={[5, 10, 15]}
             rowCount={userCount}
             disableRowSelectionOnClick
             pagination
