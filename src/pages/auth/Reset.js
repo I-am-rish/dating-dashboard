@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import {
-  CAlert,
   CButton,
   CCard,
   CCardBody,
@@ -21,14 +20,15 @@ import { useFormik } from "formik";
 import axios from "axios";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import httpClient from "../../util/HttpClient";
 
 const Reset = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [loading, SetLoading] = useState(false);
-  const [apiSuccess, setApiSuccess] = useState("");
-  const [apiError, setApiError] = useState("");
-  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
+  const [apiSuccess, setApiSuccess] = useState(false);
+  const [apiError, setApiError] = useState(false);
+  const [openSnakeBar, setOpenSnakeBar] = useState(false);
   const navigate = useNavigate();
 
   const initialValues = {
@@ -55,21 +55,23 @@ const Reset = () => {
 
   const resetPassword = (values) => {
     console.log("reset password");
-    axios
-      .put("http://localhost:4000/api/password/reset", values)
+    httpClient
+      .put("/password/reset", values)
       .then((res) => {
         if (res.data.success) {
           setAlertMessage("Password Reset Successfully");
-          setApiSuccess("Email sent to Your Email");
-          setCloseSnakeBar(true);
-          window.localStorage.clear();
+          setApiSuccess(true);
+          setApiError(false);
+          setOpenSnakeBar(true);
+          window.localStorage.delete("email");
           navigate("/auth/login");
         }
       })
       .catch((error) => {
         setAlertMessage(error.response.data.message);
-        setApiError(error.response.data.message);
-        setCloseSnakeBar(true);
+        setApiError(true);
+        setApiSuccess(false);
+        setOpenSnakeBar(true);
       });
   };
 
@@ -80,14 +82,16 @@ const Reset = () => {
       .then((res) => {
         if (res.data.success) {
           setAlertMessage("OPT sent to Your Email");
-          setApiSuccess("OTP sent to Your Email");
-          setCloseSnakeBar(true);
+          setApiSuccess(true);
+          setApiError(false);
+          setOpenSnakeBar(true);
         }
       })
       .catch((error) => {
         setAlertMessage(error.response.data.message);
-        setApiError(error.response.data.message);
-        setCloseSnakeBar(true);
+        setApiError(true);
+        setApiSuccess(false);
+        setOpenSnakeBar(true);
       });
   };
 
@@ -101,17 +105,15 @@ const Reset = () => {
               <CCard className="p-4">
                 <CCardBody>
                   <Snackbar
-                    open={closeSnakeBar}
+                    open={openSnakeBar}
                     autoHideDuration={1000}
                     message={alertMessage}
                     color="red"
                     ContentProps={{
                       sx: apiSuccess
-                        ? { color: "green" }
-                        : { color: "red", backgroundColor: "gray" },
+                        ? { background: "green" }
+                        : { backgroundColor: "red" },
                     }}
-                    // sx={{ color: "red" }}
-
                     anchorOrigin={{
                       horizontal: "right",
                       vertical: "bottom",
@@ -122,7 +124,7 @@ const Reset = () => {
                           aria-label="close"
                           color="inherit"
                           sx={{ p: 0.5 }}
-                          onClick={() => setCloseSnakeBar(false)}
+                          onClick={() => setOpenSnakeBar(false)}
                         >
                           <CloseIcon />
                         </IconButton>
@@ -147,7 +149,7 @@ const Reset = () => {
                         placeholder="OTP"
                         onChange={loginForm.handleChange}
                         value={loginForm.values.resetOTP}
-                        onClick={() => setCloseSnakeBar(false)}
+                        onClick={() => setOpenSnakeBar(false)}
                       />
                       {loginForm.errors.resetOTP &&
                         loginForm.touched.resetOTP && (
@@ -173,7 +175,7 @@ const Reset = () => {
                         placeholder="New Password"
                         onChange={loginForm.handleChange}
                         value={loginForm.values.new_password}
-                        onClick={() => setCloseSnakeBar(false)}
+                        onClick={() => setOpenSnakeBar(false)}
                       />
                       {loginForm.errors.new_password &&
                         loginForm.touched.new_password && (

@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 
 import {
-  CAlert,
   CButton,
   CCard,
   CCardBody,
@@ -18,9 +17,9 @@ import {
 } from "@coreui/react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { useFormik } from "formik";
-import axios from "axios";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import httpClient from "../../util/HttpClient";
 
 const Forgot = () => {
   const [alertMessage, setAlertMessage] = useState();
@@ -40,16 +39,17 @@ const Forgot = () => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      //   alert("hello");
       window.localStorage.setItem("email", JSON.stringify(values));
+      setTimeout(() => {
+        localStorage.removeItem("email");
+      }, 500000); //after 5 minutes email will be removed from local storage
       sendOTP(values);
-      // setAlertMessage("Hello world");
     },
   });
 
   const sendOTP = (email) => {
-    axios
-      .post("http://localhost:4000/api/password/forgot", email)
+    httpClient
+      .post("/password/forgot", email)
       .then((res) => {
         if (res.data.success) {
           setAlertMessage("Email sent to Your Email");
@@ -80,7 +80,7 @@ const Forgot = () => {
                     color="red"
                     ContentProps={{
                       sx: apiSuccess
-                        ? {backgroundColor: "blue" }
+                        ? { backgroundColor: "blue" }
                         : { backgroundColor: "red" },
                     }}
                     anchorOrigin={{

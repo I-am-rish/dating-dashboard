@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
 import AppSidebar from "../../components/AppSidebar";
 import AppHeader from "../../components/AppHeader";
-import { CContainer } from "@coreui/react";
+import {
+  CCard,
+  CCardBody,
+  CCardGroup,
+  CCol,
+  CContainer,
+  CRow,
+} from "@coreui/react";
 import PageTitle from "../common/PageTitle";
-import { DataGrid, GridDeleteForeverIcon } from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
-import axios from "axios";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
+import swal from "sweetalert2";
 
 const UserData = () => {
   const [alertMessage, setAlertMessage] = useState();
@@ -16,17 +23,18 @@ const UserData = () => {
   const [apiError, setApiError] = useState(false);
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [userCount, setUserCount] = useState(0);
-  const [rows, setRows] = React.useState([]);
+  const [rows, setRows] = useState([]);
+  const [search, setSearch] = useState();
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
 
   const columns = [
-    { field: "col1", headerName: "#", width: 70 },
-    { field: "col2", headerName: "Name", width: 150 },
-    { field: "col3", headerName: "email", width: 250 },
-    { field: "col4", headerName: "Phone Number", width: 150 },
+    { field: "col1", headerName: "#", width: 80 },
+    { field: "col2", headerName: "Name", width: 160 },
+    { field: "col3", headerName: "email", width: 260 },
+    { field: "col4", headerName: "Phone Number", width: 160 },
     { field: "col5", headerName: "Created Date", width: 170 },
     {
       field: "col6",
@@ -37,17 +45,34 @@ const UserData = () => {
           <DeleteIcon
             cursor={"pointer"}
             style={{ color: "red" }}
-            onClick={(e) => deleteSingleUser(e, params.row)}
+            onClick={(e) => confirmBeforeDelete(e, params.row)}
           />
         );
       },
     },
   ];
 
+  //handle get confirmation before delete user
+  const confirmBeforeDelete = (e, params) => {
+    swal
+      .fire({
+        title: "Are you sure?",
+        text: "You will not be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          deleteSingleUser(e, params);
+        }
+      });
+  };
+
   const deleteSingleUser = (e, params) => {
     const userId = params.id;
     httpClient
-      .delete(`http://localhost:4000/api/admin/users/user/delete?id=${userId}`)
+      .delete(`/admin/users/user/delete?id=${userId}`)
       .then((res) => {
         setAlertMessage(res.data.message);
         setApiSuccess(true);
@@ -66,7 +91,7 @@ const UserData = () => {
   useEffect(() => {
     httpClient
       .get(
-        `http://localhost:4000/api/admin/users?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`
+        `/admin/users?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`
       )
       .then((res) => {
         setUserCount(res.data.usersCount);
@@ -88,52 +113,131 @@ const UserData = () => {
       });
   }, [paginationModel, alertMessage]);
 
+  const handleRecordPerPage = (e) => {
+    paginationModel.pageSize = e.target.value;
+    setPaginationModel({ ...paginationModel });
+  };
+
+  const handleSearch = (e) => {
+    let searchValue = e.target.value.trim();
+    //if search keyword length is less than 1, reset the user info
+    if (searchValue.length <= 0) {
+      setPaginationModel({ page: 0, pageSize: 10 });
+    }
+
+    if (searchValue || searchValue === " ") {
+      searchValue = searchValue.trim();
+      setSearch(searchValue);
+      httpClient
+        .get(`/admin/users?keyword=${searchValue}`)
+        .then((res) => {
+          if (res.status === 200) {
+            setRows(
+              res.data.users.map((user, index) => {
+                return {
+                  id: user._id,
+                  col1: index + 1,
+                  col2: user.name,
+                  col3: user.email,
+                  col4: user.mobile,
+                  col5: user.createdAt,
+                };
+              })
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+
+    return;
+  };
   return (
     <>
       <AppSidebar />
       <div className="wrapper bg-light min-vh-100 m-2 d-flex-column align-items-center">
         <AppHeader />
-        <h4 className="">Users</h4>
-        <CContainer>
-          <PageTitle title="user management" />
-          <Snackbar
-            open={closeSnakeBar}
-            autoHideDuration={1000}
-            message={alertMessage}
-            ContentProps={{
-              sx: apiSuccess
-                ? { backgroundColor: "blue" }
-                : { backgroundColor: "red" },
-            }}
-            anchorOrigin={{
-              horizontal: "right",
-              vertical: "bottom",
-            }}
-            action={
-              <React.Fragment>
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  sx={{ p: 0.5 }}
-                  onClick={() => setCloseSnakeBar(false)}
-                >
-                  <CloseIcon />
-                </IconButton>
-              </React.Fragment>
-            }
-          />
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            pageSizeOptions={[5, 10, 15]}
-            rowCount={userCount}
-            disableRowSelectionOnClick
-            pagination
-            paginationMode="server"
-            paginationModel={paginationModel}
-            disableColumnMenu
-            onPaginationModelChange={setPaginationModel}
-          />
+        <PageTitle title="user management" />
+        <CContainer className="">
+          <h4 className="">Users</h4>
+          <CRow className="justify-content-center">
+            <CCol md={12}>
+              <CCardGroup>
+                <CCard className="">
+                  <CCardBody>
+                    <Snackbar
+                      open={closeSnakeBar}
+                      autoHideDuration={1000}
+                      message={alertMessage}
+                      ContentProps={{
+                        sx: apiSuccess
+                          ? { backgroundColor: "green" }
+                          : { backgroundColor: "red" },
+                      }}
+                      anchorOrigin={{
+                        horizontal: "right",
+                        vertical: "bottom",
+                      }}
+                      action={
+                        <React.Fragment>
+                          <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            sx={{ p: 0.5 }}
+                            onClick={() => setCloseSnakeBar(false)}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </React.Fragment>
+                      }
+                    />
+                    <CRow className="d-flex pb-2 vw-100 fw-700">
+                      <CCol xs={6}>
+                        Show &nbsp;
+                        <input
+                          type="number"
+                          id="number"
+                          name="number"
+                          placeholder="10"
+                          defaultValue={"10"}
+                          style={{
+                            width: "45px",
+                            outline: "none",
+                          }}
+                          onChange={handleRecordPerPage}
+                        />
+                        &nbsp; Records per page
+                      </CCol>
+                      <CCol xs={6}>
+                        Search:&nbsp;&nbsp;
+                        <input
+                          type="text"
+                          name="search"
+                          id="search"
+                          placeholder="Search..."
+                          style={{ outline: "none" }}
+                          onChange={handleSearch}
+                        />
+                      </CCol>
+                    </CRow>
+                    <DataGrid
+                      rows={rows}
+                      columns={columns}
+                      // pageSizeOptions={[5, 10, 15]}
+                      rowCount={userCount}
+                      disableRowSelectionOnClick
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      disableColumnMenu
+                      onPaginationModelChange={setPaginationModel}
+                    />
+                  </CCardBody>
+                </CCard>
+              </CCardGroup>
+            </CCol>
+          </CRow>
         </CContainer>
       </div>
     </>

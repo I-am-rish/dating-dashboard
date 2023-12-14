@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { CAlert } from "@coreui/react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
@@ -21,14 +20,13 @@ import {
 } from "@coreui/react";
 import PageTitle from "../common/PageTitle";
 import { useFormik } from "formik";
-import axios from "axios";
+import httpClient from "../../util/HttpClient";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
-  const [apiSuccess, setApiSuccess] = useState("");
-  const [apiError, setApiError] = useState("");
+  const [apiSuccess, setApiSuccess] = useState(false);
+  const [apiError, setApiError] = useState(false);
   const [openSnakeBar, setOpenSnakeBar] = useState(false);
   const navigate = useNavigate();
 
@@ -58,19 +56,21 @@ const Register = () => {
 
   //storing new user data in database
   const register = async (userInfo) => {
-    axios
-      .post("http://localhost:4000/api/register", userInfo)
+    httpClient
+      .post("/register", userInfo)
       .then((res) => {
         if (res.data.success) {
-          setApiSuccess("Registered Successfully");
+          setApiSuccess(true);
+          setApiError(false);
           setAlertMessage("Registered Successfully");
           navigate("/auth/login");
         }
         setAlertMessage("");
       })
       .catch((error) => {
-        console.log(error.response.data.message);
+        // console.log(error.response.data.message);
         setApiError(true);
+        setApiSuccess(false);
         setAlertMessage(error.response.data.message);
       });
   };
@@ -85,29 +85,33 @@ const Register = () => {
               <CCardGroup>
                 <CCard className="p-4">
                   <CCardBody>
-                    {apiSuccess && (
-                      <Snackbar
-                        open={true}
-                        autoHideDuration={6000}
-                        message={"error"}
-                        anchorOrigin={{
-                          horizontal: "right",
-                          vertical: "bottom",
-                        }}
-                        action={
-                          <React.Fragment>
-                            <IconButton
-                              aria-label="close"
-                              color="inherit"
-                              sx={{ p: 0.5 }}
-                              onClick={() => setOpenSnakeBar(false)}
-                            >
-                              <CloseIcon />
-                            </IconButton>
-                          </React.Fragment>
-                        }
-                      />
-                    )}
+                    <Snackbar
+                      open={openSnakeBar}
+                      autoHideDuration={1000}
+                      message={alertMessage}
+                      color="red"
+                      ContentProps={{
+                        sx: apiSuccess
+                          ? { backgroundColor: "green" }
+                          : { backgroundColor: "red" },
+                      }}
+                      anchorOrigin={{
+                        horizontal: "right",
+                        vertical: "bottom",
+                      }}
+                      action={
+                        <React.Fragment>
+                          <IconButton
+                            aria-label="close"
+                            color="inherit"
+                            sx={{ p: 0.5 }}
+                            onClick={() => setOpenSnakeBar(false)}
+                          >
+                            <CloseIcon />
+                          </IconButton>
+                        </React.Fragment>
+                      }
+                    />
                     <CForm onSubmit={loginForm.handleSubmit}>
                       <h1>Register</h1>
                       <p className="text-medium-emphasis">Create new account</p>

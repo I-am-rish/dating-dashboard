@@ -20,16 +20,14 @@ import {
 } from "@coreui/react";
 import PageTitle from "../common/PageTitle";
 import { useFormik } from "formik";
-import axios from "axios";
 import httpClient from "../../util/HttpClient";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [alertMessage, setAlertMessage] = useState(null);
-  const [apiSuccess, setApiSuccess] = useState("");
-  const [apiError, setApiError] = useState("");
+  const [apiSuccess, setApiSuccess] = useState(false);
+  const [apiError, setApiError] = useState(false);
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
-
 
   const navigate = useNavigate();
 
@@ -53,20 +51,22 @@ const Login = () => {
   });
 
   const login = async (userInfo) => {
-    axios
-      .post("http://localhost:4000/api/login", userInfo)
+    httpClient
+      .post("/login", userInfo)
       .then((res) => {
         if (res.data.success) {
           //store token in local storage
           window.localStorage.setItem("token", JSON.stringify(res.data.token));
-          setApiSuccess("Logged In Successfully");
+          setApiSuccess(true);
+          setApiError(false);
           setAlertMessage("Logged In Successfully");
           setCloseSnakeBar(true);
           navigate("/web/dashboard");
         }
       })
       .catch((error) => {
-        setApiError(error.response.data.message);
+        setApiError(true);
+        setApiSuccess(false);
         setAlertMessage(error.response.data.message);
         setCloseSnakeBar(true);
       });
@@ -89,10 +89,9 @@ const Login = () => {
                       color="red"
                       ContentProps={{
                         sx: apiSuccess
-                          ? { color: "white", backgroundColor: "blue" }
-                          : { color: "white", backgroundColor: "red" },
+                          ? { backgroundColor: "green" }
+                          : { backgroundColor: "red" },
                       }}
-
                       anchorOrigin={{
                         horizontal: "right",
                         vertical: "bottom",
