@@ -20,12 +20,16 @@ import { useFormik } from "formik";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
+import Loader from "../../components/loader/Loader";
 
 const Forgot = () => {
   const [alertMessage, setAlertMessage] = useState();
   const [apiSuccess, setApiSuccess] = useState("");
   const [apiError, setApiError] = useState("");
   const [openSnakeBar, setOpenSnakeBar] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [opacity, setOpacity] = useState(1);
+  const [pointerEvents, setPointerEvents] = useState("");
 
   const navigate = useNavigate();
   const initialValues = {
@@ -39,11 +43,14 @@ const Forgot = () => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
+      setPointerEvents("none");
+      setOpacity(0.3);
       window.localStorage.setItem("email", JSON.stringify(values));
       setTimeout(() => {
         localStorage.removeItem("email");
       }, 500000); //after 5 minutes email will be removed from local storage
       sendOTP(values);
+      setLoading(true);
     },
   });
 
@@ -52,6 +59,9 @@ const Forgot = () => {
       .post("/password/forgot", email)
       .then((res) => {
         if (res.data.success) {
+          setLoading(false);
+          setPointerEvents("");
+          setOpacity(1);
           setAlertMessage("Email sent to Your Email");
           setApiSuccess("Email sent to Your Email");
           setOpenSnakeBar(true);
@@ -59,6 +69,9 @@ const Forgot = () => {
         }
       })
       .catch((error) => {
+        setLoading(false);
+        setPointerEvents("");
+        setOpacity(1);
         setApiError(error.response.data.message);
         setAlertMessage(error.response.data.message);
         setOpenSnakeBar(true);
@@ -67,12 +80,16 @@ const Forgot = () => {
 
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
-      <CContainer>
+      {loading && <Loader />}
+      <CContainer
+        style={{ opacity: `${opacity}`, pointerEvents: `${pointerEvents}` }}
+      >
         <CRow className="justify-content-center">
           <CCol md={6}>
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
+                  {/* {loading && <Loader />} */}
                   <Snackbar
                     open={openSnakeBar}
                     autoHideDuration={1000}

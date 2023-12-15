@@ -21,15 +21,18 @@ import axios from "axios";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
+import Loader from "../../components/loader/Loader";
 
 const Reset = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  const [loading, SetLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [apiSuccess, setApiSuccess] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [openSnakeBar, setOpenSnakeBar] = useState(false);
   const navigate = useNavigate();
+  const [opacity, setOpacity] = useState(1);
+  const [pointerEvents, setPointerEvents] = useState("");
 
   const initialValues = {
     resetOTP: "",
@@ -48,26 +51,33 @@ const Reset = () => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
-      console.log(values);
+      setPointerEvents("none");
+      setOpacity(0.3);
       resetPassword(values);
+      setLoading(true);
     },
   });
 
   const resetPassword = (values) => {
-    console.log("reset password");
     httpClient
       .put("/password/reset", values)
       .then((res) => {
         if (res.data.success) {
+          setLoading(false);
+          setPointerEvents("");
+          setOpacity(1);
           setAlertMessage("Password Reset Successfully");
           setApiSuccess(true);
           setApiError(false);
           setOpenSnakeBar(true);
-          window.localStorage.delete("email");
+          window.localStorage.removeItem("email");
           navigate("/auth/login");
         }
       })
       .catch((error) => {
+        setLoading(false);
+        setPointerEvents("");
+        setOpacity(1);
         setAlertMessage(error.response.data.message);
         setApiError(true);
         setApiSuccess(false);
@@ -75,19 +85,36 @@ const Reset = () => {
       });
   };
 
+  const resendOTP = () => {
+    setPointerEvents("none");
+    setOpacity(0.3);
+    setLoading(true);
+    // sendOTP();
+    console.log(opacity, pointerEvents)
+  };
+
   const sendOTP = () => {
+    setPointerEvents("none");
+    setOpacity(0.3);
+    setLoading(true);
     const email = JSON.parse(window.localStorage.getItem("email"));
-    axios
-      .post("http://localhost:4000/api/password/forget", email)
+    httpClient
+      .post("/password/forgot", email)
       .then((res) => {
         if (res.data.success) {
-          setAlertMessage("OPT sent to Your Email");
+          setLoading(false);
+          setPointerEvents("");
+          setOpacity(1);
+          setAlertMessage("OTP sent to Your Email");
           setApiSuccess(true);
           setApiError(false);
           setOpenSnakeBar(true);
         }
       })
       .catch((error) => {
+        setLoading(false);
+        setPointerEvents("");
+        setOpacity(1);
         setAlertMessage(error.response.data.message);
         setApiError(true);
         setApiSuccess(false);
@@ -98,7 +125,10 @@ const Reset = () => {
   return (
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <PageTitle title={"Reset Password"} />
-      <CContainer>
+      {loading && <Loader />}
+      <CContainer
+        style={{ opacity: `${opacity}`, pointerEvents: `${pointerEvents}` }}
+      >
         <CRow className="justify-content-center">
           <CCol md={6}>
             <CCardGroup>

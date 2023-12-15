@@ -1,6 +1,7 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
 import Protected from "./Protected";
+import GuestRoutes from "./GuestRoutes";
 
 const NotFound = lazy(() => import("../pages/common/NotFound"));
 
@@ -21,7 +22,7 @@ const routes = createBrowserRouter([
   },
   {
     path: "/auth",
-    // Component: Protected,
+    Component: GuestRoutes,
     children: [
       {
         path: "",

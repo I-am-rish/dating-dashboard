@@ -21,6 +21,7 @@ import {
 import PageTitle from "../common/PageTitle";
 import { useFormik } from "formik";
 import httpClient from "../../util/HttpClient";
+import Loader from "../../components/loader/Loader";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +29,9 @@ const Login = () => {
   const [apiSuccess, setApiSuccess] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [opacity, setOpacity] = useState(1);
+  const [pointerEvents, setPointerEvents] = useState("");
 
   const navigate = useNavigate();
 
@@ -46,7 +50,10 @@ const Login = () => {
     initialValues,
     validationSchema,
     onSubmit: (values) => {
+      setPointerEvents("none");
+      setOpacity(0.3);
       login(values);
+      setLoading(true);
     },
   });
 
@@ -65,6 +72,9 @@ const Login = () => {
         }
       })
       .catch((error) => {
+        setLoading(false);
+        setPointerEvents("");
+        setOpacity(1);
         setApiError(true);
         setApiSuccess(false);
         setAlertMessage(error.response.data.message);
@@ -76,7 +86,10 @@ const Login = () => {
     <>
       <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
         <PageTitle title={"Login"} />
-        <CContainer>
+        {loading && <Loader />}
+        <CContainer
+          style={{ opacity: `${opacity}`, pointerEvents: `${pointerEvents}` }}
+        >
           <CRow className="justify-content-center">
             <CCol md={6}>
               <CCardGroup>

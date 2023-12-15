@@ -16,6 +16,7 @@ import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
 import swal from "sweetalert2";
+import Loader from "../../components/loader/Loader";
 
 const UserData = () => {
   const [alertMessage, setAlertMessage] = useState();
@@ -25,6 +26,7 @@ const UserData = () => {
   const [userCount, setUserCount] = useState(0);
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState();
+  const [loading, setLoading] = useState(true);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -78,12 +80,14 @@ const UserData = () => {
         setApiSuccess(true);
         setApiError(false);
         setCloseSnakeBar(true);
+        setLoading(false);
       })
       .catch((error) => {
         setAlertMessage(error.response.data.message);
         setApiError(true);
         setApiSuccess(false);
         setCloseSnakeBar(true);
+        // setLoading(false)
       });
   };
 
@@ -95,6 +99,7 @@ const UserData = () => {
       )
       .then((res) => {
         setUserCount(res.data.usersCount);
+        setLoading(false);
         setRows(
           res.data.users.map((user, index) => {
             return {
@@ -109,16 +114,19 @@ const UserData = () => {
         );
       })
       .catch((error) => {
+        // setLoading(false)
         console.log(error.response.data.message);
       });
   }, [paginationModel, alertMessage]);
 
   const handleRecordPerPage = (e) => {
+    setLoading(true);
     paginationModel.pageSize = e.target.value;
     setPaginationModel({ ...paginationModel });
   };
 
   const handleSearch = (e) => {
+    setLoading(true);
     let searchValue = e.target.value.trim();
     //if search keyword length is less than 1, reset the user info
     if (searchValue.length <= 0) {
@@ -132,6 +140,7 @@ const UserData = () => {
         .get(`/admin/users?keyword=${searchValue}`)
         .then((res) => {
           if (res.status === 200) {
+            setLoading(false);
             setRows(
               res.data.users.map((user, index) => {
                 return {
@@ -159,6 +168,7 @@ const UserData = () => {
       <div className="wrapper bg-light min-vh-100 m-2 d-flex-column align-items-center">
         <AppHeader />
         <PageTitle title="user management" />
+
         <CContainer className="">
           <h4 className="">Users</h4>
           <CRow className="justify-content-center">
@@ -192,7 +202,9 @@ const UserData = () => {
                         </React.Fragment>
                       }
                     />
-                    <CRow className="d-flex pb-2 vw-100 fw-700">
+                    <CRow className="d-flex pb-2"
+                    sx={{ backgroundColor:"red"}}
+                    >
                       <CCol xs={6}>
                         Show &nbsp;
                         <input
@@ -221,18 +233,21 @@ const UserData = () => {
                         />
                       </CCol>
                     </CRow>
-                    <DataGrid
-                      rows={rows}
-                      columns={columns}
-                      // pageSizeOptions={[5, 10, 15]}
-                      rowCount={userCount}
-                      disableRowSelectionOnClick
-                      pagination
-                      paginationMode="server"
-                      paginationModel={paginationModel}
-                      disableColumnMenu
-                      onPaginationModelChange={setPaginationModel}
-                    />
+                    <div style={{width:"100%"}}>
+                      <DataGrid
+                        rows={rows}
+                        columns={columns}
+                        // pageSizeOptions={[5, 10, 15]}
+                        rowCount={userCount}
+                        disableRowSelectionOnClick
+                        pagination
+                        paginationMode="server"
+                        paginationModel={paginationModel}
+                        disableColumnMenu
+                        onPaginationModelChange={setPaginationModel}
+                        loading={loading}
+                      />
+                    </div>
                   </CCardBody>
                 </CCard>
               </CCardGroup>

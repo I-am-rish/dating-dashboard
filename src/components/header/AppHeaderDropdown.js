@@ -10,14 +10,14 @@ import {
 
 import avatar8 from "./../../assets/images/avatars/8.jpg";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import httpClient from "../../util/HttpClient";
 
 const AppHeaderDropdown = () => {
   const navigate = useNavigate();
 
   const handleLogOut = async () => {
-    axios
-      .get("http://localhost:4000/api/logout")
+    httpClient
+      .get("/logout")
       .then((res) => {
         if (res.data.success) {
           localStorage.removeItem("token"); //remove token from local storage
