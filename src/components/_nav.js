@@ -24,6 +24,12 @@ const _nav = [
     to: "/web/users",
     icon: <i className="bi bi-person"></i>,
   },
+  {
+    component: CNavItem,
+    name: "Content Pages",
+    to: "/web/content",
+    icon: <i class="bi bi-file-text"></i>,
+  },
 ];
 
 export default _nav;

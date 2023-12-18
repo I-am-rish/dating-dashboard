@@ -2,6 +2,8 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import { lazy } from "react";
 import Protected from "./Protected";
 import GuestRoutes from "./GuestRoutes";
+import ContentManager from "../pages/authenticated/ContentManager";
+import EditContent from "../pages/authenticated/EditContent";
 
 const NotFound = lazy(() => import("../pages/common/NotFound"));
 
@@ -61,6 +63,10 @@ const routes = createBrowserRouter([
       {
         path: "user/profile",
         Component: Profile,
+      },
+      {
+        path: "content",
+        Component: ContentManager,
       },
     ],
   },

@@ -15,7 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
-import swal from "sweetalert2";
+import swal from "sweetalert2"; 
 import Loader from "../../components/loader/Loader";
 
 const UserData = () => {
@@ -25,7 +25,7 @@ const UserData = () => {
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [userCount, setUserCount] = useState(0);
   const [rows, setRows] = useState([]);
-  const [search, setSearch] = useState();
+  const [search, setSearch] = useState(); 
   const [loading, setLoading] = useState(true);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
@@ -34,8 +34,8 @@ const UserData = () => {
 
   const columns = [
     { field: "col1", headerName: "#", width: 80 },
-    { field: "col2", headerName: "Name", width: 160 },
-    { field: "col3", headerName: "email", width: 260 },
+    { field: "col2", headerName: "Name", width: 200 },
+    { field: "col3", headerName: "email", width: 300 },
     { field: "col4", headerName: "Phone Number", width: 160 },
     { field: "col5", headerName: "Created Date", width: 170 },
     {
@@ -108,7 +108,7 @@ const UserData = () => {
               col2: user.name,
               col3: user.email,
               col4: user.mobile,
-              col5: user.createdAt,
+              col5: user.createdAt.substring(0, 10),
             };
           })
         );
@@ -202,11 +202,11 @@ const UserData = () => {
                         </React.Fragment>
                       }
                     />
-                    <CRow className="d-flex pb-2"
-                    sx={{ backgroundColor:"red"}}
+                    <CRow
+                      className="d-flex pb-2"
                     >
-                      <CCol xs={6}>
-                        Show &nbsp;
+                      <CCol xs={5}>
+                        Show
                         <input
                           type="number"
                           id="number"
@@ -219,10 +219,10 @@ const UserData = () => {
                           }}
                           onChange={handleRecordPerPage}
                         />
-                        &nbsp; Records per page
+                        Records per page
                       </CCol>
-                      <CCol xs={6}>
-                        Search:&nbsp;&nbsp;
+                      <CCol xs={5}>
+                        Search:&nbsp;
                         <input
                           type="text"
                           name="search"
@@ -233,21 +233,25 @@ const UserData = () => {
                         />
                       </CCol>
                     </CRow>
-                    <div style={{width:"100%"}}>
-                      <DataGrid
-                        rows={rows}
-                        columns={columns}
-                        // pageSizeOptions={[5, 10, 15]}
-                        rowCount={userCount}
-                        disableRowSelectionOnClick
-                        pagination
-                        paginationMode="server"
-                        paginationModel={paginationModel}
-                        disableColumnMenu
-                        onPaginationModelChange={setPaginationModel}
-                        loading={loading}
-                      />
-                    </div>
+                    {/* <div style={{width:"100%",}}> */}
+                    <DataGrid
+                      rows={rows}
+                      columns={columns}
+                      // pageSizeOptions={[5, 10, 15]}
+                      rowCount={userCount}
+                      disableRowSelectionOnClick
+                      pagination
+                      paginationMode="server"
+                      paginationModel={paginationModel}
+                      disableColumnMenu
+                      onPaginationModelChange={setPaginationModel}
+                      loading={loading}
+                      //implement server side sorting
+                      sortingMode="server"
+                      // sortingOrder={}
+                      // sortModel={}
+                    />
+                    {/* </div> */}
                   </CCardBody>
                 </CCard>
               </CCardGroup>
