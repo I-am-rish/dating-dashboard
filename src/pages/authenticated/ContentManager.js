@@ -24,12 +24,12 @@ const ContentManager = () => {
   const [apiSuccess, setApiSuccess] = useState(false);
   const [apiError, setApiError] = useState(false);
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
-  const [userCount, setUserCount] = useState(0);
+  const [contentCount, setContentCount] = useState(0);
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState();
   const [loading, setLoading] = useState(true);
   const [editor, setEditor] = useState(false);
-  const [title, setTitle] = useState("");
+  const [editContent, setEditContent] = useState({});
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -68,8 +68,11 @@ const ContentManager = () => {
       .then((result) => {
         if (result.isConfirmed) {
           //collar func
-          console.log("content manager", params.col2);
-          setTitle(params.col2);
+          setEditContent({
+            id: params.id,
+            title: params.col2,
+            content: params.col3,
+          });
           setEditor(true);
         }
       });
@@ -78,27 +81,25 @@ const ContentManager = () => {
   //fetching information
   useEffect(() => {
     httpClient
-      .get(
-        `/admin/users?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`
-      )
+      .get(`/admin/content?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`)
       .then((res) => {
-        setUserCount(res.data.usersCount);
+        setContentCount(res.data.contentCount);
         setLoading(false);
         setRows(
-          res.data.users.map((user, index) => {
+          res.data.contentData.map((content, index) => {
             return {
-              id: user._id,
+              id: content._id,
               col1: index + 1,
-              col2: user.name,
-              col3: user.email,
-              col4: user.mobile,
-              col5: user.createdAt.substring(0, 10),
+              col2: content.title,
+              col3: content.content,
+              // col5: content.createdAt.substring(0, 10),
             };
           })
         );
       })
       .catch((error) => {
         setLoading(false);
+        console.log(error);
         if (error.response.data) console.log(error.response.data.message);
       });
   }, [paginationModel, alertMessage]);
@@ -121,12 +122,14 @@ const ContentManager = () => {
       searchValue = searchValue.trim();
       setSearch(searchValue);
       httpClient
-        .get(`/admin/users?keyword=${searchValue}`)
+        .get(`/admin/content?keyword=${searchValue}`)
         .then((res) => {
           if (res.status === 200) {
+            console.log(searchValue)
+            console.log(res.data.contentData);
             setLoading(false);
             setRows(
-              res.data.users.map((user, index) => {
+              res.data.contentData.map((user, index) => {
                 return {
                   id: user._id,
                   col1: index + 1,
@@ -140,7 +143,7 @@ const ContentManager = () => {
           }
         })
         .catch((err) => {
-          console.log(err);
+          console.log("content manager", err);
         });
     }
 
@@ -161,32 +164,6 @@ const ContentManager = () => {
                 <CCardGroup>
                   <CCard className="">
                     <CCardBody>
-                      {/* <Snackbar
-                        open={closeSnakeBar}
-                        autoHideDuration={1000}
-                        message={alertMessage}
-                        ContentProps={{
-                          sx: apiSuccess
-                            ? { backgroundColor: "green" }
-                            : { backgroundColor: "red" },
-                        }}
-                        anchorOrigin={{
-                          horizontal: "right",
-                          vertical: "bottom",
-                        }}
-                        action={
-                          <React.Fragment>
-                            <IconButton
-                              aria-label="close"
-                              color="inherit"
-                              sx={{ p: 0.5 }}
-                              onClick={() => setCloseSnakeBar(false)}
-                            >
-                              <CloseIcon />
-                            </IconButton>
-                          </React.Fragment>
-                        }
-                      /> */}
                       <CRow
                         className="d-flex pb-2"
                         sx={{ backgroundColor: "red" }}
@@ -224,7 +201,7 @@ const ContentManager = () => {
                         rows={rows}
                         columns={columns}
                         // pageSizeOptions={[5, 10, 15]}
-                        rowCount={userCount}
+                        rowCount={contentCount}
                         disableRowSelectionOnClick
                         pagination
                         paginationMode="server"
@@ -241,7 +218,7 @@ const ContentManager = () => {
             </CRow>
           </CContainer>
         ) : (
-          <EditContent pageTitle={title} callback={setEditor} />
+          <EditContent editContent={editContent} callback={setEditor} />
         )}
       </div>
     </>

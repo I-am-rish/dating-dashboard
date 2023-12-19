@@ -28,7 +28,7 @@ const _nav = [
     component: CNavItem,
     name: "Content Pages",
     to: "/web/content",
-    icon: <i class="bi bi-file-text"></i>,
+    icon: <i className="bi bi-file-text"></i>,
   },
 ];
 

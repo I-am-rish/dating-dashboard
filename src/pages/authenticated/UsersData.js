@@ -114,7 +114,7 @@ const UserData = () => {
         );
       })
       .catch((error) => {
-        // setLoading(false)
+        setLoading(false)
         console.log(error.response.data.message);
       });
   }, [paginationModel, alertMessage]);
@@ -247,7 +247,7 @@ const UserData = () => {
                       onPaginationModelChange={setPaginationModel}
                       loading={loading}
                       //implement server side sorting
-                      sortingMode="server"
+                      // sortingMode="server"
                       // sortingOrder={}
                       // sortModel={}
                     />

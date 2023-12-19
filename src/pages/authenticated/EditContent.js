@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   CCard,
   CCardBody,
@@ -8,24 +8,44 @@ import {
   CRow,
 } from "@coreui/react";
 import PageTitle from "../common/PageTitle";
-import { Editor } from "react-draft-wysiwyg";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import JoditEditor from "jodit-react";
-import { useNavigate } from "react-router-dom";
 import httpClient from "../../util/HttpClient";
-const EditContent = ({ pageTitle, callback }) => {
-  console.log("edit content", pageTitle);
-  const navigate = useNavigate();
+import { IconButton, Snackbar } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+const EditContent = ({ editContent, callback }) => {
   const editor = useRef(null);
-  const [content, setContent] = useState("jvdjbhvhbvhbvbvfd");
+  const [alertMessage, setAlertMessage] = useState(null);
+  const [apiSuccess, setApiSuccess] = useState(false);
+  const [apiError, setApiError] = useState(false);
+  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
+  const [content, setContent] = useState(editContent.content);
 
-  const updatePageData = () => {
+  useEffect(() => {}, []);
+
+  const updatePageData = async () => {
+    setCloseSnakeBar(true);
     //fetch data from db and update
-    httpClient.put("/").then(res => {
-
-    }).catch(err => {
-        alert('Error while updating the page');
-    })
+    const newContent = {
+      content: content.substring(3, content.length - 4).trim(),
+    };
+    httpClient
+      .put(`/admin/web/content?id=${editContent.id}`, newContent)
+      .then((res) => {
+        if (res.status === 200) {
+          setApiError(false);
+          setAlertMessage("Update Successful");
+          setApiSuccess(true);
+          setCloseSnakeBar(false);
+        }
+      })
+      .catch((err) => {
+        setApiSuccess(false);
+        setAlertMessage("Something Went Wrong!");
+        setApiError(true);
+        setCloseSnakeBar(false);
+        console.log(err);
+      });
   };
 
   const handleBackBtn = () => {
@@ -37,6 +57,34 @@ const EditContent = ({ pageTitle, callback }) => {
       <div className=" bg-light min-vh-100 m-2 d-flex-column align-items-center">
         <PageTitle title="edit page" />
         <CContainer className="">
+          <Snackbar
+            open={closeSnakeBar}
+            autoHideDuration={1000}
+            message={alertMessage}
+            color="red"
+            ContentProps={{
+              sx: apiSuccess
+                ? { backgroundColor: "green" }
+                : { backgroundColor: "red" },
+            }}
+            anchorOrigin={{
+              horizontal: "right",
+              vertical: "bottom",
+            }}
+            action={
+              <React.Fragment>
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  sx={{ p: 0.5 }}
+                  onClick={() => setCloseSnakeBar(false)}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </React.Fragment>
+            }
+          />
+
           <div
             style={{
               width: "100%",
@@ -61,7 +109,7 @@ const EditContent = ({ pageTitle, callback }) => {
             >
               <i
                 style={{ fontSize: "25px" }}
-                class="bi bi-arrow-left-short"
+                className="bi bi-arrow-left-short"
               ></i>
             </button>
           </div>
@@ -84,7 +132,7 @@ const EditContent = ({ pageTitle, callback }) => {
                         fontWeight: 600,
                       }}
                       disabled
-                      value={pageTitle}
+                      value={editContent.title}
                     />
                     <h5 style={{ fontWeight: 700 }}>Page Content</h5>
                     <div
@@ -98,13 +146,10 @@ const EditContent = ({ pageTitle, callback }) => {
                         // config={config}
                         tabIndex={1} // tabIndex of textarea
                         onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                        // onChange={(newContent) => }
                       />
                     </div>
                     <button
-                      onClick={() => {
-                        updatePageData();
-                      }}
+                      onClick={updatePageData}
                       style={{
                         border: "none",
                         backgroundColor: "blue",
