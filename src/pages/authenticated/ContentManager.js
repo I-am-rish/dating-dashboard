@@ -92,7 +92,7 @@ const ContentManager = () => {
               col1: index + 1,
               col2: content.title,
               col3: content.content,
-              // col5: content.createdAt.substring(0, 10),
+              col5: content.createdAt.substring(0, 10),
             };
           })
         );

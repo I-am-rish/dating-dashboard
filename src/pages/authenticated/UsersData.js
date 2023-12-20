@@ -15,7 +15,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
-import swal from "sweetalert2"; 
+import swal from "sweetalert2";
 import Loader from "../../components/loader/Loader";
 
 const UserData = () => {
@@ -25,12 +25,13 @@ const UserData = () => {
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [userCount, setUserCount] = useState(0);
   const [rows, setRows] = useState([]);
-  const [search, setSearch] = useState(); 
+  const [search, setSearch] = useState();
   const [loading, setLoading] = useState(true);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
+  const [filterModel, setFilterModel] = useState({Items: []});
 
   const columns = [
     { field: "col1", headerName: "#", width: 80 },
@@ -114,7 +115,7 @@ const UserData = () => {
         );
       })
       .catch((error) => {
-        setLoading(false)
+        setLoading(false);
         console.log(error.response.data.message);
       });
   }, [paginationModel, alertMessage]);
@@ -149,7 +150,7 @@ const UserData = () => {
                   col2: user.name,
                   col3: user.email,
                   col4: user.mobile,
-                  col5: user.createdAt,
+                  col5: user.createdAt.substring(0, 10),
                 };
               })
             );
@@ -202,9 +203,7 @@ const UserData = () => {
                         </React.Fragment>
                       }
                     />
-                    <CRow
-                      className="d-flex pb-2"
-                    >
+                    <CRow className="d-flex pb-2">
                       <CCol xs={5}>
                         Show
                         <input
@@ -243,13 +242,14 @@ const UserData = () => {
                       pagination
                       paginationMode="server"
                       paginationModel={paginationModel}
-                      disableColumnMenu
+                      // disableColumnMenu
                       onPaginationModelChange={setPaginationModel}
                       loading={loading}
-                      //implement server side sorting
-                      // sortingMode="server"
-                      // sortingOrder={}
-                      // sortModel={}
+                      //implement server side filtering
+                      filterMode="server"
+                      // filterModel={filterModel}
+                      onFilterModelChange={setFilterModel}
+                      
                     />
                     {/* </div> */}
                   </CCardBody>

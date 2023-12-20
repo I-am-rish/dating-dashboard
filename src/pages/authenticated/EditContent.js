@@ -30,20 +30,21 @@ const EditContent = ({ editContent, callback }) => {
       content: content.substring(3, content.length - 4).trim(),
     };
     httpClient
-      .put(`/admin/web/content?id=${editContent.id}`, newContent)
+      .put(`/admin/content?id=${editContent.id}`, newContent)
       .then((res) => {
         if (res.status === 200) {
           setApiError(false);
           setAlertMessage("Update Successful");
           setApiSuccess(true);
-          setCloseSnakeBar(false);
+          setCloseSnakeBar(true);
+          handleBackBtn()
         }
       })
       .catch((err) => {
         setApiSuccess(false);
         setAlertMessage("Something Went Wrong!");
         setApiError(true);
-        setCloseSnakeBar(false);
+        setCloseSnakeBar(true);
         console.log(err);
       });
   };
