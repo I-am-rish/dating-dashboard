@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const httpClient = axios.create({
-  baseURL: "http://localhost:4000/api", // Replace this with your API base URL
+  baseURL: "https://web-server-yexb.onrender.com/api", // Replace this with your API base URL
 });
 
 // Request interceptor
