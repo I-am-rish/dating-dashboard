@@ -59,21 +59,23 @@ const Forgot = () => {
       .post("/password/forgot", email)
       .then((res) => {
         if (res.data.success) {
+          setApiError(false);
           setLoading(false);
           setPointerEvents("");
           setOpacity(1);
           setAlertMessage("Email sent to Your Email");
-          setApiSuccess("Email sent to Your Email");
+          setApiSuccess(true);
           setOpenSnakeBar(true);
           navigate("/auth/reset");
         }
       })
       .catch((error) => {
+        setApiSuccess(false);
         setLoading(false);
         setPointerEvents("");
         setOpacity(1);
-        setApiError(error.response.data.message);
-        setAlertMessage(error.response.data.message);
+        setApiError(true);
+        if (error.response.data) setAlertMessage(error.response.data.message);
         setOpenSnakeBar(true);
       });
   };

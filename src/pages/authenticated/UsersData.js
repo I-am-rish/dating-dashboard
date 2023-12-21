@@ -10,9 +10,10 @@ import {
   CRow,
 } from "@coreui/react";
 import PageTitle from "../common/PageTitle";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { IconButton, Snackbar } from "@mui/material";
+import { IconButton, Snackbar, createStyles, makeStyles } from "@mui/material";
+// const  from "mui/styles"
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
 import swal from "sweetalert2";
@@ -25,13 +26,14 @@ const UserData = () => {
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [userCount, setUserCount] = useState(0);
   const [rows, setRows] = useState([]);
-  const [search, setSearch] = useState();
+  // const [search, setSearch] = useState();
   const [loading, setLoading] = useState(true);
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
   });
-  const [filterModel, setFilterModel] = useState({Items: []});
+
+  const [filterMode, setFilterMode] = useState("name");
 
   const columns = [
     { field: "col1", headerName: "#", width: 80 },
@@ -42,7 +44,7 @@ const UserData = () => {
     {
       field: "col6",
       headerName: "Action",
-      width: 90,
+      width: 125,
       renderCell: (params) => {
         return (
           <DeleteIcon
@@ -136,10 +138,11 @@ const UserData = () => {
 
     if (searchValue || searchValue === " ") {
       searchValue = searchValue.trim();
-      setSearch(searchValue);
+      // setSearch(searchValue);
       httpClient
-        .get(`/admin/users?keyword=${searchValue}`)
+        .get(`/admin/users?keyword=${searchValue}&key=${filterMode}`)
         .then((res) => {
+          setUserCount(res.data.users.length);
           if (res.status === 200) {
             setLoading(false);
             setRows(
@@ -160,9 +163,9 @@ const UserData = () => {
           console.log(err);
         });
     }
-
     return;
   };
+
   return (
     <>
       <AppSidebar />
@@ -170,93 +173,134 @@ const UserData = () => {
         <AppHeader />
         <PageTitle title="user management" />
 
-        <CContainer className="">
+        <CContainer>
           <h4 className="">Users</h4>
-          <CRow className="justify-content-center">
-            <CCol md={12}>
-              <CCardGroup>
-                <CCard className="">
-                  <CCardBody>
-                    <Snackbar
-                      open={closeSnakeBar}
-                      autoHideDuration={1000}
-                      message={alertMessage}
-                      ContentProps={{
-                        sx: apiSuccess
-                          ? { backgroundColor: "green" }
-                          : { backgroundColor: "red" },
-                      }}
-                      anchorOrigin={{
-                        horizontal: "right",
-                        vertical: "bottom",
-                      }}
-                      action={
-                        <React.Fragment>
-                          <IconButton
-                            aria-label="close"
-                            color="inherit"
-                            sx={{ p: 0.5 }}
-                            onClick={() => setCloseSnakeBar(false)}
-                          >
-                            <CloseIcon />
-                          </IconButton>
-                        </React.Fragment>
-                      }
-                    />
-                    <CRow className="d-flex pb-2">
-                      <CCol xs={5}>
-                        Show
-                        <input
-                          type="number"
-                          id="number"
-                          name="number"
-                          placeholder="10"
-                          defaultValue={"10"}
-                          style={{
-                            width: "45px",
-                            outline: "none",
-                          }}
-                          onChange={handleRecordPerPage}
-                        />
-                        Records per page
-                      </CCol>
-                      <CCol xs={5}>
-                        Search:&nbsp;
-                        <input
-                          type="text"
-                          name="search"
-                          id="search"
-                          placeholder="Search..."
-                          style={{ outline: "none" }}
-                          onChange={handleSearch}
-                        />
-                      </CCol>
-                    </CRow>
-                    {/* <div style={{width:"100%",}}> */}
-                    <DataGrid
-                      rows={rows}
-                      columns={columns}
-                      // pageSizeOptions={[5, 10, 15]}
-                      rowCount={userCount}
-                      disableRowSelectionOnClick
-                      pagination
-                      paginationMode="server"
-                      paginationModel={paginationModel}
-                      // disableColumnMenu
-                      onPaginationModelChange={setPaginationModel}
-                      loading={loading}
-                      //implement server side filtering
-                      filterMode="server"
-                      // filterModel={filterModel}
-                      onFilterModelChange={setFilterModel}
-                      
-                    />
-                    {/* </div> */}
-                  </CCardBody>
-                </CCard>
-              </CCardGroup>
-            </CCol>
-          </CRow>
+          <div
+            style={{
+              border: "1px solid gray",
+              padding: 15,
+              borderRadius: 5,
+            }}
+          >
+            <Snackbar
+              open={closeSnakeBar}
+              autoHideDuration={1000}
+              message={alertMessage}
+              ContentProps={{
+                sx: apiSuccess
+                  ? { backgroundColor: "green" }
+                  : { backgroundColor: "red" },
+              }}
+              anchorOrigin={{
+                horizontal: "right",
+                vertical: "bottom",
+              }}
+              action={
+                <React.Fragment>
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    sx={{ p: 0.5 }}
+                    onClick={() => setCloseSnakeBar(false)}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </React.Fragment>
+              }
+            />
+            <div
+              // className="pb-2 color-red"
+              style={{
+                width: "95%",
+                // backgroundColor: "green",
+                height: "auto",
+                display: "flex",
+                justifyContent: "space-between",
+                padding: "10px 0",
+              }}
+            >
+              <CCol xs={5} style={{}}>
+                Show
+                <input
+                  type="number"
+                  id="number"
+                  name="number"
+                  placeholder="10"
+                  defaultValue={"10"}
+                  min={0}
+                  style={{
+                    width: "40px",
+                    outline: "none",
+                    borderRadius: 5,
+                    border: "1px solid gray",
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                    textAlign: "center",
+                    height: 25
+                  }}
+                  onChange={handleRecordPerPage}
+                />
+                Records per page
+              </CCol>
+              <CCol
+                xs={5}
+                style={{
+                  width: "270px",
+                  // backgroundColor: "green",
+                  display: "flex",
+                }}
+              >
+                Search:&nbsp;
+                <input
+                  type="text"
+                  name="search"
+                  id="search"
+                  placeholder="Search..."
+                  style={{
+                    outline: "none",
+                    borderRadius: 5,
+                    border: "1px solid gray",
+                  }}
+                  onChange={handleSearch}
+                />
+                <select
+                  onClick={(e) => setFilterMode(e.target.value)}
+                  style={{ borderRadius: 5, outline: "none" }}
+                >
+                  {/* <option disabled>select</option> */}
+                  <option value={"name"}>name</option>
+                  <option value="email">email</option>
+                  <option value="mobile">mobile</option>
+                </select>
+              </CCol>
+            </div>
+            <DataGrid
+              sx={{
+                "& .MuiDataGrid-row:nth-child(2n)": {
+                  backgroundColor: "#d5dbd6",
+                },
+                "& .MuiDataGrid-columnHeader": {
+                  backgroundColor: "#d5dbd6",
+                  height: '40px !important'
+                },
+              }}
+              rows={rows}
+              columns={columns}
+              // pageSizeOptions={[5, 10, 15]}
+              rowCount={userCount}
+              disableRowSelectionOnClick
+              pagination
+              paginationMode="server"
+              paginationModel={paginationModel}
+              disableColumnMenu
+              onPaginationModelChange={setPaginationModel}
+              loading={loading}
+              //implement server side filtering
+              // filterMode="server"
+              // filterModel={filterModel}
+              // onFilterModelChange={setFilterModel}
+            />
+          </div>
         </CContainer>
       </div>
     </>

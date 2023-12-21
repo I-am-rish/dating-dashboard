@@ -77,7 +77,7 @@ const Login = () => {
         setOpacity(1);
         setApiError(true);
         setApiSuccess(false);
-        setAlertMessage(error.response.data.message);
+        setAlertMessage("Invalid Credentials");
         setCloseSnakeBar(true);
       });
   };

@@ -71,7 +71,7 @@ const Register = () => {
         // console.log(error.response.data.message);
         setApiError(true);
         setApiSuccess(false);
-        setAlertMessage(error.response.data.message);
+        if (error.response.data) setAlertMessage(error.response.data.message);
       });
   };
 
