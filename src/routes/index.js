@@ -31,7 +31,7 @@ const routes = createBrowserRouter([
         element: <Navigate to={"login"} />,
       },
       {
-        path: "Register",
+        path: "register",
         Component: Register,
       },
       {
