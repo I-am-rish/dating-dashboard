@@ -12,18 +12,14 @@ import {
 import PageTitle from "../common/PageTitle";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
-import { IconButton, Snackbar } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+// import { IconButton, Snackbar } from "@mui/material";
 import httpClient from "../../util/HttpClient";
 import swal from "sweetalert2";
-import Loader from "../../components/loader/Loader";
+// import Loader from "../../components/loader/Loader";
 import EditContent from "./EditContent";
 
 const ContentManager = () => {
   const [alertMessage, setAlertMessage] = useState();
-  const [apiSuccess, setApiSuccess] = useState(false);
-  const [apiError, setApiError] = useState(false);
-  const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [contentCount, setContentCount] = useState(0);
   const [rows, setRows] = useState([]);
   const [search, setSearch] = useState();
@@ -81,7 +77,9 @@ const ContentManager = () => {
   //fetching information
   useEffect(() => {
     httpClient
-      .get(`/admin/content?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`)
+      .get(
+        `/admin/content?pageNumber=${paginationModel.page}&resultPerPage=${paginationModel.pageSize}`
+      )
       .then((res) => {
         setContentCount(res.data.contentCount);
         setLoading(false);
@@ -102,7 +100,7 @@ const ContentManager = () => {
         console.log(error);
         if (error.response.data) console.log(error.response.data.message);
       });
-  }, [paginationModel, alertMessage]);
+  }, [paginationModel, alertMessage, editor]);
 
   const handleRecordPerPage = (e) => {
     setLoading(true);
@@ -125,24 +123,25 @@ const ContentManager = () => {
         .get(`/admin/content?keyword=${searchValue}`)
         .then((res) => {
           if (res.status === 200) {
-            console.log(searchValue)
-            console.log(res.data.contentData);
+            // console.log(searchValue);
+            // console.log(res.data.contentData);
             setLoading(false);
             setRows(
-              res.data.contentData.map((user, index) => {
+              res.data.contentData.map((value, index) => {
                 return {
-                  id: user._id,
+                  id: value._id,
                   col1: index + 1,
-                  col2: user.name,
-                  col3: user.email,
-                  col4: user.mobile,
-                  col5: user.createdAt,
+                  col2: value.name,
+                  col3: value.email,
+                  col4: value.mobile,
+                  col5: value.createdAt,
                 };
               })
             );
           }
         })
         .catch((err) => {
+          setLoading(false);
           console.log("content manager", err);
         });
     }
@@ -164,39 +163,65 @@ const ContentManager = () => {
                 <CCardGroup>
                   <CCard className="">
                     <CCardBody>
-                      <CRow
-                        className="d-flex pb-2"
-                        sx={{ backgroundColor: "red" }}
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "auto",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          padding: "10px 0",
+                        }}
                       >
-                        <CCol xs={6}>
-                          Show &nbsp;
+                        <CCol xs={5} style={{}}>
+                          Show
                           <input
                             type="number"
                             id="number"
                             name="number"
                             placeholder="10"
                             defaultValue={"10"}
+                            outline="none"
+                            title="Enter a Number"
+                            cursor="pointer"
+                            min={0}
                             style={{
-                              width: "45px",
+                              width: "40px",
                               outline: "none",
+                              borderRadius: 5,
+                              border: "1px solid gray",
+                              fontSize: "1rem",
+                              fontWeight: 600,
+                              textAlign: "center",
+                              height: 25,
                             }}
                             onChange={handleRecordPerPage}
                           />
-                          &nbsp; Records per page
+                          Records per page
                         </CCol>
-                        <CCol xs={6}>
-                          Search:&nbsp;&nbsp;
+                        <CCol
+                          xs={6}
+                          style={{
+                            width: "30%",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          Search:&nbsp;
                           <input
                             type="text"
                             name="search"
                             id="search"
                             placeholder="Search..."
-                            style={{ outline: "none" }}
+                            style={{
+                              width: "100%",
+                              outline: "none",
+                              borderRadius: 5,
+                              border: "1px solid gray",
+                            }}
                             onChange={handleSearch}
                           />
                         </CCol>
-                      </CRow>
-                      {/* <div style={{width:"100%",}}> */}
+                      </div>
                       <DataGrid
                         rows={rows}
                         columns={columns}

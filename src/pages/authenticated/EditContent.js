@@ -21,10 +21,12 @@ const EditContent = ({ editContent, callback }) => {
   const [closeSnakeBar, setCloseSnakeBar] = useState(false);
   const [content, setContent] = useState(editContent.content);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    
+  }, []);
+  console.log('edit content')
 
   const updatePageData = async () => {
-    setCloseSnakeBar(true);
     //fetch data from db and update
     const newContent = {
       content: content.substring(3, content.length - 4).trim(),
@@ -38,7 +40,7 @@ const EditContent = ({ editContent, callback }) => {
           setApiSuccess(true);
           setCloseSnakeBar(true);
           handleBackBtn()
-        }
+        } 
       })
       .catch((err) => {
         setApiSuccess(false);

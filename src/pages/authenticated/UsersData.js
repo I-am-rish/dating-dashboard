@@ -177,6 +177,7 @@ const UserData = () => {
           <h4 className="">Users</h4>
           <div
             style={{
+              minHeight: "300px",
               border: "1px solid gray",
               padding: 15,
               borderRadius: 5,
@@ -209,10 +210,8 @@ const UserData = () => {
               }
             />
             <div
-              // className="pb-2 color-red"
               style={{
-                width: "95%",
-                // backgroundColor: "green",
+                width: "100%",
                 height: "auto",
                 display: "flex",
                 justifyContent: "space-between",
@@ -227,6 +226,9 @@ const UserData = () => {
                   name="number"
                   placeholder="10"
                   defaultValue={"10"}
+                  outline="none"
+                  title="Enter a Number"
+                  cursor="pointer"
                   min={0}
                   style={{
                     width: "40px",
@@ -236,18 +238,19 @@ const UserData = () => {
                     fontSize: "1rem",
                     fontWeight: 600,
                     textAlign: "center",
-                    height: 25
+                    height: 25,
+                    
                   }}
                   onChange={handleRecordPerPage}
                 />
                 Records per page
               </CCol>
               <CCol
-                xs={5}
+                xs={6}
                 style={{
-                  width: "270px",
-                  // backgroundColor: "green",
+                  width: "30%",
                   display: "flex",
+                  alignItems: "center",
                 }}
               >
                 Search:&nbsp;
@@ -257,33 +260,35 @@ const UserData = () => {
                   id="search"
                   placeholder="Search..."
                   style={{
+                    width: "100%",
                     outline: "none",
                     borderRadius: 5,
                     border: "1px solid gray",
                   }}
                   onChange={handleSearch}
                 />
-                <select
+                {/* <select
                   onClick={(e) => setFilterMode(e.target.value)}
                   style={{ borderRadius: 5, outline: "none" }}
                 >
-                  {/* <option disabled>select</option> */}
+                  <option disabled selected>select</option>
                   <option value={"name"}>name</option>
                   <option value="email">email</option>
                   <option value="mobile">mobile</option>
-                </select>
+                </select> */}
               </CCol>
             </div>
             <DataGrid
               sx={{
-                "& .MuiDataGrid-row:nth-child(2n)": {
+                "& .MuiDataGrid-row:nth-of-type(2n)": {
                   backgroundColor: "#d5dbd6",
                 },
                 "& .MuiDataGrid-columnHeader": {
                   backgroundColor: "#d5dbd6",
-                  height: '40px !important'
+                  // height: "40px !important",
                 },
               }}
+             
               rows={rows}
               columns={columns}
               // pageSizeOptions={[5, 10, 15]}
@@ -295,10 +300,7 @@ const UserData = () => {
               disableColumnMenu
               onPaginationModelChange={setPaginationModel}
               loading={loading}
-              //implement server side filtering
-              // filterMode="server"
-              // filterModel={filterModel}
-              // onFilterModelChange={setFilterModel}
+              autoHeight
             />
           </div>
         </CContainer>
