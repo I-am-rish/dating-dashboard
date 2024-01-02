@@ -59,7 +59,7 @@ const Register = () => {
     httpClient
       .post("/register", userInfo)
       .then((res) => {
-        if (res.data.success) {
+        if (res.data && res.data.success) {
           setApiSuccess(true);
           setApiError(false);
           setAlertMessage("Registered Successfully");
@@ -71,7 +71,10 @@ const Register = () => {
         // console.log(error.response.data.message);
         setApiError(true);
         setApiSuccess(false);
-        if (error.response.data) setAlertMessage(error.response.data.message);
+        if (error.response && error.response.data) {
+          setAlertMessage(error.response.data.message);
+        }
+        setAlertMessage("Something went wrong!");
       });
   };
 

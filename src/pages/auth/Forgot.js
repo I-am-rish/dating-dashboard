@@ -58,7 +58,7 @@ const Forgot = () => {
     httpClient
       .post("/password/forgot", email)
       .then((res) => {
-        if (res.data.success) {
+        if (res.data && res.data.success) {
           setApiError(false);
           setLoading(false);
           setPointerEvents("");
@@ -75,7 +75,10 @@ const Forgot = () => {
         setPointerEvents("");
         setOpacity(1);
         setApiError(true);
-        if (error.response.data) setAlertMessage(error.response.data.message);
+        if (error.response && error.response.data) {
+          setAlertMessage(error.response.data.message);
+        }
+        setAlertMessage("Something went wrong!");
         setOpenSnakeBar(true);
       });
   };

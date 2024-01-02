@@ -61,7 +61,7 @@ const Login = () => {
     httpClient
       .post("/login", userInfo)
       .then((res) => {
-        if (res.data.success) {
+        if (res.data && res.data.success) {
           //store token in local storage
           window.localStorage.setItem("token", JSON.stringify(res.data.token));
           setApiSuccess(true);
@@ -77,6 +77,9 @@ const Login = () => {
         setOpacity(1);
         setApiError(true);
         setApiSuccess(false);
+        if (error.response && error.response.data) {
+          setAlertMessage(error.response.data.message);
+        }
         setAlertMessage("Invalid Credentials");
         setCloseSnakeBar(true);
       });

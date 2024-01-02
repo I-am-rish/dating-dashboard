@@ -62,7 +62,7 @@ const Reset = () => {
     httpClient
       .put("/password/reset", values)
       .then((res) => {
-        if (res.data.success) {
+        if (res.data && res.data.success) {
           setLoading(false);
           setPointerEvents("");
           setOpacity(1);
@@ -78,10 +78,13 @@ const Reset = () => {
         setLoading(false);
         setPointerEvents("");
         setOpacity(1);
-        setAlertMessage(error.response.data.message);
         setApiError(true);
         setApiSuccess(false);
         setOpenSnakeBar(true);
+        if (error.response && error.response.data) {
+          setAlertMessage(error.response.data.message);
+        }
+        setAlertMessage("Something went wrong!");
       });
   };
 
@@ -90,7 +93,7 @@ const Reset = () => {
     setOpacity(0.3);
     setLoading(true);
     // sendOTP();
-    console.log(opacity, pointerEvents)
+    console.log(opacity, pointerEvents);
   };
 
   const sendOTP = () => {
