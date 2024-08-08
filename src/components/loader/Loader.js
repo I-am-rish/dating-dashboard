@@ -6,7 +6,7 @@ const Loader = ({ width }) => {
     <div
       style={{
         position: "absolute",
-        top:"44%",
+        top:"45%",
         left: "44%",
         zIndex:100
       }}

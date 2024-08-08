@@ -16,17 +16,18 @@ const AppHeaderDropdown = () => {
   const navigate = useNavigate();
 
   const handleLogOut = async () => {
-    httpClient
-      .get("/logout")
-      .then((res) => {
-        if (res.data.success) {
-          localStorage.removeItem("token"); //remove token from local storage
-          navigate("/auth/login");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    console.log("logout")
+    localStorage.removeItem("token"); //remove token from local storage
+    navigate("/auth/login");
+    // httpClient
+    //   .get("/logout")
+    //   .then((res) => {
+    //     if (res.data.success) {
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
   };
   return (
     <CDropdown variant="nav-item">

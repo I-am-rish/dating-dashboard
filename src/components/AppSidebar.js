@@ -14,6 +14,23 @@ import 'simplebar/dist/simplebar.min.css'
 
 // sidebar nav config
 import navigation from './_nav'
+import styled from 'styled-components'
+
+const SidebarLink = styled("a")(({ theme, active }) => ({
+  display: "block",
+  padding: theme.spacing(1, 2),
+  fontSize: "16px",
+  color: active ? theme.palette.common.white : theme.palette.text.primary,
+  textDecoration: "none",
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: active ? theme.palette.primary.main : "transparent",
+  transition: "background-color 0.3s, color 0.3s",
+  "&:hover": {
+    backgroundColor: "red",//theme.palette.action.hover,
+    color: "green !important",
+  },
+}));
+
 
 const AppSidebar = () => {
   const dispatch = useDispatch()
@@ -28,20 +45,23 @@ const AppSidebar = () => {
       onVisibleChange={(visible) => {
         dispatch({ type: 'set', sidebarShow: visible })
       }}
+     style={{
+      // backgroundColor: "red"
+     }}
     >
-      {/* <CSidebarBrand className="d-none d-md-flex" to="/">
-        <CIcon className="sidebar-brand-full" icon={logoNegative} height={35} />
-        <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} />
-      </CSidebarBrand> */}
+      {/* <CSidebarBrand className="d-none d-md-flex" to="/"> */}
+        {/* <CIcon className="sidebar-brand-full" icon={logoNegative} height={35} />
+        <CIcon className="sidebar-brand-narrow" icon={sygnet} height={35} /> */}
+      {/* </CSidebarBrand> */}
       <CSidebarNav>
         <SimpleBar>
           <AppSidebarNav items={navigation} />
         </SimpleBar>
       </CSidebarNav>
-      {/* <CSidebarToggler
+      <CSidebarToggler
         className="d-none d-lg-flex"
         onClick={() => dispatch({ type: 'set', sidebarUnfoldable: !unfoldable })}
-      /> */}
+      />
     </CSidebar>
   )
 }

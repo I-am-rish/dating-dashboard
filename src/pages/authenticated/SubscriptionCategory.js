@@ -5,13 +5,14 @@ import { CCol, CContainer } from "@coreui/react";
 import PageTitle from "../common/PageTitle";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { IconButton, Snackbar, Switch } from "@mui/material";
+import { IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import httpClient from "../../util/HttpClient";
 import swal from "sweetalert2";
 import Loader from "../../components/loader/Loader";
+import axios from "axios";
 
-const UserData = () => {
+const SubscriptionCategory = () => {
   const [alertMessage, setAlertMessage] = useState();
   const [apiSuccess, setApiSuccess] = useState(false);
   const [apiError, setApiError] = useState(false);
@@ -28,21 +29,10 @@ const UserData = () => {
   const [status, setStatus] = useState("");
   const [keyword, setKeyword] = useState("");
 
-  const handleStatusChange = (e, params) => {
-    setRows((prevRows) =>
-      prevRows.map((row) => {
-        if (row.id === params.id) {
-          updateStatus(params.id, row.col3);
-        }
-        return row.id === params.id ? { ...row, col3: !row.col3 } : row;
-      })
-    );
-  };
-
-  const updateStatus = (id, status) => {
+  const handleSelect = (e) => {
     httpClient
-      .patch(`/admin/users/${id}`, {
-        is_active: status === true ? false : true,
+      .patch(`/admin/users/${e.target.id}`, {
+        is_active: e.target.value === "active" ? true : false,
       })
       .then((res) => {
         console.log("update status ==> ", res);
@@ -51,61 +41,42 @@ const UserData = () => {
   };
 
   const columns = [
-    { field: "col1", headerName: "#", width: 80 },
+    { field: "col1", headerName: "#", width: 200 },
+    // { field: "col2", headerName: "Title", width: 200 },
     {
       field: "col2",
-      headerName: "Profile",
-      width: 140,
-      renderCell: (params) => {
-        return params.formattedValue !== "N/A" ? (
-          <img
-            style={{
-              width: "45px",
-              height: "45px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              cursor: "pointer",
-            }}
-            src={params.formattedValue}
-            alt="profile"
-          />
-        ) : (
-          <img
-            style={{
-              width: "45px",
-              height: "45px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              cursor: "pointer",
-              background: "transparent",
-            }}
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0xKoXUryp0JZ1Sxp-99eQiQcFrmA1M1qbQ&s"
-            alt="profile"
-          />
-        );
-      },
+      headerName: "Title",
+      width: 400,
     },
     {
       field: "col3",
-      headerName: "Status",
-      width: 120,
+      headerName: "Created At",
+      width: 200,
+    },
+    {
+      field: "col4",
+      headerName: "Edit Content",
+      width: 215,
       renderCell: (params) => {
         return (
-          <Switch
-            checked={params.row.col3 === true ? true : false}
-            onChange={(e) => handleStatusChange(e, params.row)}
-          />
+          <button
+            style={{
+              color: "#fcda14",
+              background: "transparent",
+              padding: "5px",
+              fontWeight: "700",
+            }}
+            className="border-0"
+          >
+            Edit Content
+          </button>
         );
       },
     },
-    { field: "col4", headerName: "Name", width: 200 },
-    { field: "col5", headerName: "email", width: 200 },
-    { field: "col6", headerName: "Phone Number", width: 160 },
-    { field: "col7", headerName: "Created Date", width: 170 },
     {
-      field: "col8",
+      field: "col5",
       headerName: "Action",
-      width: 125,
+      width: 200,
       renderCell: (params) => {
         return (
           <DeleteIcon
@@ -158,27 +129,21 @@ const UserData = () => {
 
   //fetching user information
   useEffect(() => {
-    setLoading(true);
     httpClient
-      .get(
-        `/admin/users?page=${paginationModel.page}&pageSize=${paginationModel.pageSize}&search=${keyword}`
-      )
+      .get(`/admin/get-all-content`)
       .then((res) => {
+        console.log("content => ", res);
         setUserCount(res.data?.result?.count);
         setLoading(false);
         setRows(
-          res.data.result.docs.map((user, index) => {
+          res.data.result.map((doc, index) => {
             return {
-              id: user._id,
-              col1:
-                paginationModel.page * paginationModel.pageSize + (index + 1),
-
-              col2: user.profile_picture || "N/A",
-              col3: user.is_active || "false",
-              col4: user.username || "User",
-              col5: user.email || "Not Available",
-              col6: user.phone || "Not Available",
-              col7: user.created_at.substring(0, 10),
+              id: doc._id,
+              col1: index + 1,
+              col2: doc.title || "N/A",
+              col3: doc.created_at.substring(0, 10),
+              col4: doc.thumbnail || "N/A",
+              //   col4: doc.username || "N/A",
             };
           })
         );
@@ -188,7 +153,7 @@ const UserData = () => {
         setLoading(false);
         console.log(error);
       });
-  }, [paginationModel, alertMessage, status, keyword]);
+  }, []);
 
   const handleRecordPerPage = (e) => {
     setLoading(true);
@@ -196,56 +161,19 @@ const UserData = () => {
     setPaginationModel({ ...paginationModel });
   };
 
-  const handleSearch = (e) => {
-    setLoading(true);
-    let searchValue = e.target.value.trim();
-    //if search keyword length is less than 1, reset the user info
-    if (searchValue.length <= 0) {
-      setPaginationModel({ page: 0, pageSize: 10 });
-    }
-
-    if (searchValue || searchValue === " ") {
-      searchValue = searchValue.trim();
-      // setSearch(searchValue);
-      httpClient
-        .get(`/admin/users?keyword=${searchValue}&key=${filterMode}`)
-        .then((res) => {
-          setUserCount(res.data.users.length);
-          if (res.status === 200) {
-            setLoading(false);
-            setRows(
-              res.data.users.map((user, index) => {
-                return {
-                  id: user._id,
-                  col1: index + 1,
-                  col2: user.name,
-                  col3: user.email,
-                  col4: user.mobile,
-                  col5: user.createdAt.substring(0, 10),
-                };
-              })
-            );
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    return;
-  };
-
   return (
     <>
       <AppSidebar />
-      <div className="wrapper bg-light min-vh-100 d-flex-column align-items-center">
+      <div className="wrapper bg-light min-vh-100 m-2 d-flex-column align-items-center">
         <AppHeader />
-        <PageTitle title="user  management" />
+        <PageTitle title="groups" />
 
         <CContainer>
-          <h4 className="">Users</h4>
+          <h4 className="">Content</h4>
           <div
             style={{
-              minHeight: "300px",
+              height: "600px",
+              minHeight: "600px",
               border: "1px solid gray",
               padding: 15,
               borderRadius: 5,
@@ -339,15 +267,6 @@ const UserData = () => {
                     setKeyword(keyword);
                   }}
                 />
-                {/* <select
-                  onClick={(e) => setFilterMode(e.target.value)}
-                  style={{ borderRadius: 5, outline: "none" }}
-                >
-                  <option disabled selected>select</option>
-                  <option value={"name"}>name</option>
-                  <option value="email">email</option>
-                  <option value="mobile">mobile</option>
-                </select> */}
               </CCol>
             </div>
             <DataGrid
@@ -363,13 +282,17 @@ const UserData = () => {
                 "& .MuiDataGrid-cell": {
                   outline: "none !important",
                 },
+                "& .MuiDataGrid-row": {
+                  outline: "none !important",
+                  //   backgroundColor: "gold",
+                },
               }}
               rows={rows}
               columns={columns}
               // pageSizeOptions={[5, 10, 15]}
               rowCount={userCount}
               disableRowSelectionOnClick
-              pagination
+              //   pagination
               paginationMode="server"
               paginationModel={paginationModel}
               disableColumnMenu
@@ -384,4 +307,4 @@ const UserData = () => {
   );
 };
 
-export default React.memo(UserData);
+export default React.memo(SubscriptionCategory);

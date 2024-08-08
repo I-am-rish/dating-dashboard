@@ -59,16 +59,17 @@ const Login = () => {
 
   const login = async (userInfo) => {
     httpClient
-      .post("/login", userInfo)
+      .post("/admin/login", userInfo)
       .then((res) => {
-        if (res.data && res.data.success) {
+        console.log("login => ", res)
+        if (res.data && res.data?.status) {
           //store token in local storage
-          window.localStorage.setItem("token", JSON.stringify(res.data.token));
+          window.localStorage.setItem("token", JSON.stringify(res.data.result.authToken));
           setApiSuccess(true);
           setApiError(false);
           setAlertMessage("Logged In Successfully");
           setCloseSnakeBar(true);
-          navigate("/web/dashboard");
+          navigate("/dashboard");
         }
       })
       .catch((error) => {
@@ -77,8 +78,8 @@ const Login = () => {
         setOpacity(1);
         setApiError(true);
         setApiSuccess(false);
-        if (error.response && error.response.data) {
-          setAlertMessage(error.response.data.message);
+        if (error.response && error?.response?.data) {
+          setAlertMessage(error.response?.data?.message);
         }
         setAlertMessage("Invalid Credentials");
         setCloseSnakeBar(true);

@@ -56,7 +56,7 @@ const Forgot = () => {
 
   const sendOTP = (email) => {
     httpClient
-      .post("/password/forgot", email)
+      .post("/admin/forgot-password", {email})
       .then((res) => {
         if (res.data && res.data.success) {
           setApiError(false);

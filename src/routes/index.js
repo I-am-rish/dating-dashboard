@@ -10,9 +10,49 @@ const Register = lazy(() => import("../pages/auth/Register"));
 const Login = lazy(() => import("../pages/auth/Login"));
 const Forgot = lazy(() => import("../pages/auth/Forgot"));
 const Reset = lazy(() => import("../pages/auth/Reset"));
-const Dashboard = lazy(() => import("../pages/authenticated/Dashboard"));
+const Dashboard = lazy(() =>
+  import("../pages/authenticated/dashboard/Dashboard")
+);
 const UsersData = lazy(() => import("../pages/authenticated/UsersData"));
 const Profile = lazy(() => import("../pages/authenticated/Profile"));
+const Groups = lazy(() => import("../pages/authenticated/group/Groups"));
+const AddGroup = lazy(() => import("../pages/authenticated/group/AddGroup"));
+const EditGroup = lazy(() => import("../pages/authenticated/group/EditGroup"));
+const Content = lazy(() => import("../pages/authenticated/content/Content"));
+const NewContent = lazy(() =>
+  import("../pages/authenticated/content/NewContent")
+);
+const EditContent = lazy(() =>
+  import("../pages/authenticated/content/EditContent")
+);
+const Questions = lazy(() =>
+  import("../pages/authenticated/question/Questions")
+);
+const AddQuestion = lazy(() =>
+  import("../pages/authenticated/question/AddQuestion")
+);
+const EditQuestions = lazy(() =>
+  import("../pages/authenticated/question/EditQuestion")
+);
+const Preference = lazy(() =>
+  import("../pages/authenticated/preference/Preference")
+);
+const Filter = lazy(() => import("../pages/authenticated/filter/Filter"));
+const FAQ = lazy(() => import("../pages/authenticated/faq/FAQ"));
+const AddFAQ = lazy(() => import("../pages/authenticated/faq/AddFAQ"));
+const EditFAQ = lazy(() => import("../pages/authenticated/faq/EditFAQ"));
+const SubscriptionCategory = lazy(() =>
+  import("../pages/authenticated/SubscriptionCategory")
+);
+
+const Feedbacks = lazy(() =>
+  import("../pages/authenticated/feedbacks/Feedbacks")
+);
+const View = lazy(() => import("../pages/authenticated/feedbacks/View"));
+const ContactUs = lazy(() =>
+  import("../pages/authenticated/contactus/ContactUs")
+);
+const Contact = lazy(() => import("../pages/authenticated/contactus/Contact"));
 
 const routes = createBrowserRouter([
   {
@@ -46,7 +86,7 @@ const routes = createBrowserRouter([
     ],
   },
   {
-    path: "/web",
+    path: "/",
     Component: Protected,
     children: [
       {
@@ -58,12 +98,80 @@ const routes = createBrowserRouter([
         Component: UsersData,
       },
       {
-        path: "user/profile",
-        Component: Profile,
+        path: "groups",
+        Component: Groups,
+      },
+      {
+        path: "groups/add-group",
+        Component: AddGroup,
+      },
+      {
+        path: "groups/edit-group/:id",
+        Component: EditGroup,
       },
       {
         path: "content",
-        Component: ContentManager,
+        Component: Content,
+      },
+      {
+        path: "content/new-content",
+        Component: NewContent,
+      },
+      {
+        path: "content/edit-content/:id",
+        Component: EditContent,
+      },
+      {
+        path: "questions",
+        Component: Questions,
+      },
+      {
+        path: "questions/add-question",
+        Component: AddQuestion,
+      },
+      {
+        path: "questions/edit-question/:id",
+        Component: EditQuestions,
+      },
+      {
+        path: "preference",
+        Component: Preference,
+      },
+      {
+        path: "filter",
+        Component: Filter,
+      },
+      {
+        path: "faqs",
+        Component: FAQ,
+      },
+      {
+        path: "faqs/add-faq",
+        Component: AddFAQ,
+      },
+      {
+        path: "faqs/update-faq/:id",
+        Component: EditFAQ,
+      },
+      {
+        path: "subscription_category",
+        Component: SubscriptionCategory,
+      },
+      {
+        path: "feedbacks",
+        Component: Feedbacks,
+      },
+      {
+        path: "feedbacks/view",
+        Component: View,
+      },
+      {
+        path: "contacts",
+        Component: ContactUs,
+      },
+      {
+        path: "contact",
+        Component: Contact,
       },
     ],
   },

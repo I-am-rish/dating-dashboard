@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const httpClient = axios.create({
-  baseURL:'http://localhost:4000/api', // Replace this with your API base URL
+  // baseURL:'http://localhost:7200', // Replace this with your API base URL
+  baseURL: "http://44.195.125.80:7200", // Replace this with your API base URL
 });
 
 // Request interceptor
@@ -15,7 +16,8 @@ httpClient.interceptors.request.use(
       token = JSON.parse(token);
     }
 
-    request.headers["Authorization"] = token;
+    request.headers["Authorization"] = `Bearer ${token}`;
+    console.log("token => ", `Bearer ${token}`);
     // console.log("request interceptors", token);
 
     return request;

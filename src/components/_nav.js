@@ -1,34 +1,101 @@
 import React from "react";
 import { CNavItem } from "@coreui/react";
+import FeedbackIcon from "@mui/icons-material/Feedback";
+import ContactMailIcon from "@mui/icons-material/ContactMail";
+import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
+import QuizIcon from "@mui/icons-material/Quiz";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import SourceIcon from "@mui/icons-material/Source";
+import Diversity1Icon from "@mui/icons-material/Diversity1";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
+import Logo from "./logo.png";
 
 const _nav = [
   {
     component: CNavItem,
-    name: "Admin",
-    to: "/web/dashboard",
-    icon: <i className="bi bi-speedometer"></i>,
+    name: "Truily Dashboard",
+    to: "/dashboard",
+    icon: (
+      <img
+        src={Logo}
+        width={"45px"}
+        style={{
+          width: "45px",
+          height: "45px",
+          borderRadius: "50%",
+          objectFit: "cover",
+          cursor: "pointer",
+          background: "transparent"
+        }}
+      />
+    ), //<i className="bi bi-speedometer"></i>,
+    //logo
     // badge: {
-    //   color: 'info',
-    //   text: 'NEW',
+    //   color: "info",
+    //   text: "NEW",
     // },
   },
   {
     component: CNavItem,
-    name: "Profile",
-    to: "/web/user/profile",
-    icon: <i className="bi bi-person"></i>,
+    name: "User Management",
+    to: "/users",
+    icon: <ManageAccountsIcon />,
   },
   {
     component: CNavItem,
-    name: "Users Management",
-    to: "/web/users",
-    icon: <i className="bi bi-person"></i>,
+    name: "Groups",
+    to: "/groups",
+    icon: <Diversity1Icon />,
   },
   {
     component: CNavItem,
     name: "Content Pages",
-    to: "/web/content",
-    icon: <i className="bi bi-file-text"></i>,
+    to: "/content",
+    icon: <SourceIcon />,
+  },
+  {
+    component: CNavItem,
+    name: "Questions",
+    to: "/questions",
+    icon: <QuestionAnswerIcon />,
+  },
+  // {
+  //   component: CNavItem,
+  //   name: "Preference",
+  //   to: "/preference",
+  //   icon: <SettingsAccessibilityIcon />,
+  // },
+  // {
+  //   component: CNavItem,
+  //   name: "Filter",
+  //   to: "/filter",
+  //   icon: <FilterListIcon />,
+  // },
+  {
+    component: CNavItem,
+    name: "FAQ",
+    to: "/faqs",
+    icon: <QuizIcon />,
+  },
+  // {
+  //   component: CNavItem,
+  //   name: "Subscription Category",
+  //   to: "/subscription_category",
+  //   icon: <SubscriptionsIcon />,
+  // },
+  {
+    component: CNavItem,
+    name: "Feedbacks",
+    to: "/feedbacks",
+    icon: <FeedbackIcon />,
+  },
+  {
+    component: CNavItem,
+    name: "Contact Us",
+    to: "/contacts",
+    icon: <ContactMailIcon />,
   },
 ];
 

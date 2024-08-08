@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
-import AppSidebar from "../../components/AppSidebar";
-import AppHeader from "../../components/AppHeader";
+import AppSidebar from "../../../components/AppSidebar";
+import AppHeader from "../../../components/AppHeader";
 import { CCol, CContainer } from "@coreui/react";
-import PageTitle from "../common/PageTitle";
+import PageTitle from "../../common/PageTitle";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { IconButton, Snackbar, Switch } from "@mui/material";
+import { Button, IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import httpClient from "../../util/HttpClient";
+import httpClient from "../../../util/HttpClient";
 import swal from "sweetalert2";
-import Loader from "../../components/loader/Loader";
+import Loader from "../../../components/loader/Loader";
+import axios from "axios";
+import { useNavigate, useParams } from "react-router-dom";
 
-const UserData = () => {
+const FAQ = () => {
   const [alertMessage, setAlertMessage] = useState();
   const [apiSuccess, setApiSuccess] = useState(false);
   const [apiError, setApiError] = useState(false);
@@ -27,22 +29,12 @@ const UserData = () => {
   const [filterMode, setFilterMode] = useState("name");
   const [status, setStatus] = useState("");
   const [keyword, setKeyword] = useState("");
+  let navigate = useNavigate();
 
-  const handleStatusChange = (e, params) => {
-    setRows((prevRows) =>
-      prevRows.map((row) => {
-        if (row.id === params.id) {
-          updateStatus(params.id, row.col3);
-        }
-        return row.id === params.id ? { ...row, col3: !row.col3 } : row;
-      })
-    );
-  };
-
-  const updateStatus = (id, status) => {
+  const handleSelect = (e) => {
     httpClient
-      .patch(`/admin/users/${id}`, {
-        is_active: status === true ? false : true,
+      .patch(`/admin/users/${e.target.id}`, {
+        is_active: e.target.value === "active" ? true : false,
       })
       .then((res) => {
         console.log("update status ==> ", res);
@@ -51,68 +43,53 @@ const UserData = () => {
   };
 
   const columns = [
-    { field: "col1", headerName: "#", width: 80 },
+    { field: "col1", headerName: "#", width: 200 },
+    // { field: "col2", headerName: "Title", width: 200 },
     {
       field: "col2",
-      headerName: "Profile",
-      width: 140,
-      renderCell: (params) => {
-        return params.formattedValue !== "N/A" ? (
-          <img
-            style={{
-              width: "45px",
-              height: "45px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              cursor: "pointer",
-            }}
-            src={params.formattedValue}
-            alt="profile"
-          />
-        ) : (
-          <img
-            style={{
-              width: "45px",
-              height: "45px",
-              borderRadius: "50%",
-              objectFit: "cover",
-              cursor: "pointer",
-              background: "transparent",
-            }}
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRp0xKoXUryp0JZ1Sxp-99eQiQcFrmA1M1qbQ&s"
-            alt="profile"
-          />
-        );
-      },
+      headerName: "Question",
+      width: 400,
     },
     {
       field: "col3",
-      headerName: "Status",
-      width: 120,
-      renderCell: (params) => {
-        return (
-          <Switch
-            checked={params.row.col3 === true ? true : false}
-            onChange={(e) => handleStatusChange(e, params.row)}
-          />
-        );
-      },
+      headerName: "Answer",
+      width: 500,
     },
-    { field: "col4", headerName: "Name", width: 200 },
-    { field: "col5", headerName: "email", width: 200 },
-    { field: "col6", headerName: "Phone Number", width: 160 },
-    { field: "col7", headerName: "Created Date", width: 170 },
+    // {
+    //   field: "col4",
+    //   headerName: "Created At",
+    //   width: 200,
+    // },
     {
-      field: "col8",
+      field: "col5",
       headerName: "Action",
-      width: 125,
+      width: 115,
       renderCell: (params) => {
         return (
-          <DeleteIcon
-            cursor={"pointer"}
-            style={{ color: "red" }}
-            onClick={(e) => confirmBeforeDelete(e, params.row)}
-          />
+          <>
+            <button
+              className="border-0"
+              style={{
+                color: "green",
+                background: "transparent",
+                padding: "5px",
+                fontWeight: "700",
+                border: "none",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                console.log("edit question ==> ", params.row.id);
+                navigate(`/faqs/update-faq/${params.row.id}`);
+              }}
+            >
+              Edit
+            </button>
+            <DeleteIcon
+              cursor={"pointer"}
+              style={{ color: "red" }}
+              onClick={(e) => confirmBeforeDelete(e, params.row)}
+            />
+          </>
         );
       },
     },
@@ -138,7 +115,9 @@ const UserData = () => {
   const deleteSingleUser = (e, params) => {
     const userId = params.id;
     httpClient
-      .delete(`/admin/users/delete/${userId}`)
+      .delete(
+        `/admin/delete-faq/${userId}`
+      )
       .then((res) => {
         setAlertMessage(res.data.message);
         setApiSuccess(true);
@@ -160,25 +139,22 @@ const UserData = () => {
   useEffect(() => {
     setLoading(true);
     httpClient
-      .get(
-        `/admin/users?page=${paginationModel.page}&pageSize=${paginationModel.pageSize}&search=${keyword}`
-      )
+      .get(`/admin/get-all-faq`)
       .then((res) => {
+        console.log("content => ", res);
         setUserCount(res.data?.result?.count);
         setLoading(false);
         setRows(
-          res.data.result.docs.map((user, index) => {
+          res.data.result.docs.map((doc, index) => {
             return {
-              id: user._id,
+              id: doc._id,
               col1:
                 paginationModel.page * paginationModel.pageSize + (index + 1),
-
-              col2: user.profile_picture || "N/A",
-              col3: user.is_active || "false",
-              col4: user.username || "User",
-              col5: user.email || "Not Available",
-              col6: user.phone || "Not Available",
-              col7: user.created_at.substring(0, 10),
+              col2: doc.question || "N/A",
+              col3: doc.answer || "N/A",
+              // col4: doc.created_at.substring(0, 10),
+              col5: doc.thumbnail || "N/A",
+              //   col4: doc.username || "N/A",
             };
           })
         );
@@ -188,7 +164,7 @@ const UserData = () => {
         setLoading(false);
         console.log(error);
       });
-  }, [paginationModel, alertMessage, status, keyword]);
+  }, [paginationModel, status]);
 
   const handleRecordPerPage = (e) => {
     setLoading(true);
@@ -196,56 +172,33 @@ const UserData = () => {
     setPaginationModel({ ...paginationModel });
   };
 
-  const handleSearch = (e) => {
-    setLoading(true);
-    let searchValue = e.target.value.trim();
-    //if search keyword length is less than 1, reset the user info
-    if (searchValue.length <= 0) {
-      setPaginationModel({ page: 0, pageSize: 10 });
-    }
-
-    if (searchValue || searchValue === " ") {
-      searchValue = searchValue.trim();
-      // setSearch(searchValue);
-      httpClient
-        .get(`/admin/users?keyword=${searchValue}&key=${filterMode}`)
-        .then((res) => {
-          setUserCount(res.data.users.length);
-          if (res.status === 200) {
-            setLoading(false);
-            setRows(
-              res.data.users.map((user, index) => {
-                return {
-                  id: user._id,
-                  col1: index + 1,
-                  col2: user.name,
-                  col3: user.email,
-                  col4: user.mobile,
-                  col5: user.createdAt.substring(0, 10),
-                };
-              })
-            );
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-    return;
-  };
-
   return (
     <>
       <AppSidebar />
-      <div className="wrapper bg-light min-vh-100 d-flex-column align-items-center">
+      <div className="wrapper bg-light d-flex-column align-items-center">
         <AppHeader />
-        <PageTitle title="user  management" />
+        <PageTitle title="FAQ" />
 
         <CContainer>
-          <h4 className="">Users</h4>
+          <div className="d-flex justify-content-between pe-">
+            <h4 className="p-0">FAQ : </h4>
+            <Button
+              variant="contained"
+              className="my-2"
+              sx={{
+                backgroundColor: "orange",
+              }}
+              onClick={() => {
+                window.location.href = "faqs/add-faq";
+              }}
+            >
+              Add FAQ
+            </Button>
+          </div>
           <div
             style={{
-              minHeight: "300px",
+              height: "600px",
+              minHeight: "600px",
               border: "1px solid gray",
               padding: 15,
               borderRadius: 5,
@@ -313,42 +266,6 @@ const UserData = () => {
                 />
                 Records per page
               </CCol>
-              <CCol
-                xs={6}
-                style={{
-                  width: "30%",
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                Search:
-                <input
-                  className="ms-2 ps-1"
-                  type="text"
-                  name="search"
-                  id="search"
-                  placeholder="name..."
-                  style={{
-                    width: "100%",
-                    outline: "none",
-                    borderRadius: 5,
-                    border: "1px solid gray",
-                  }}
-                  onChange={(e) => {
-                    let keyword = e.target.value.trim();
-                    setKeyword(keyword);
-                  }}
-                />
-                {/* <select
-                  onClick={(e) => setFilterMode(e.target.value)}
-                  style={{ borderRadius: 5, outline: "none" }}
-                >
-                  <option disabled selected>select</option>
-                  <option value={"name"}>name</option>
-                  <option value="email">email</option>
-                  <option value="mobile">mobile</option>
-                </select> */}
-              </CCol>
             </div>
             <DataGrid
               sx={{
@@ -363,13 +280,17 @@ const UserData = () => {
                 "& .MuiDataGrid-cell": {
                   outline: "none !important",
                 },
+                "& .MuiDataGrid-row": {
+                  outline: "none !important",
+                  //   backgroundColor: "gold",
+                },
               }}
               rows={rows}
               columns={columns}
               // pageSizeOptions={[5, 10, 15]}
               rowCount={userCount}
               disableRowSelectionOnClick
-              pagination
+              //   pagination
               paginationMode="server"
               paginationModel={paginationModel}
               disableColumnMenu
@@ -384,4 +305,4 @@ const UserData = () => {
   );
 };
 
-export default React.memo(UserData);
+export default React.memo(FAQ);
