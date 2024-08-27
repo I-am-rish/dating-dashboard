@@ -53,6 +53,13 @@ const ContactUs = lazy(() =>
   import("../pages/authenticated/contactus/ContactUs")
 );
 const Contact = lazy(() => import("../pages/authenticated/contactus/Contact"));
+const AppSetting = lazy(() => import("../pages/authenticated/appSetting/AppSetting"));
+const LoginTrouble = lazy(() => import("../pages/authenticated/loginTrouble/LoginTrouble"));
+const AddNewLoginTrouble = lazy(() => import("../pages/authenticated/loginTrouble/AddNewLoginTrouble"));
+const EditLoginTrouble = lazy(() =>
+  import("../pages/authenticated/loginTrouble/EditLoginTrouble")
+);
+const UsersSubscription = lazy(() => import("../pages/authenticated/usersSubscription/UsersSubscription"));
 
 const routes = createBrowserRouter([
   {
@@ -172,6 +179,26 @@ const routes = createBrowserRouter([
       {
         path: "contact",
         Component: Contact,
+      },
+      {
+        path: "app-setting",
+        Component: AppSetting,
+      },
+      {
+        path: "login-trouble",
+        Component: LoginTrouble,
+      },
+      {
+        path: "login-trouble/add-login-trouble",
+        Component: AddNewLoginTrouble,
+      },
+      {
+        path: "login-trouble/edit-login-trouble/:id",
+        Component: EditLoginTrouble,
+      },
+      {
+        path: "users-subscription",
+        Component: UsersSubscription,
       },
     ],
   },

@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { memo, useCallback } from "react";
 import { Helmet } from "react-helmet";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -21,6 +21,7 @@ import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 
 const images = ["GroupsIcon"];
 
+
 function Card(props) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(0);
@@ -38,6 +39,7 @@ function Card(props) {
   const handleToggle = () => {
     // navigate("/user");
   };
+
 
   return (
     <>
@@ -351,4 +353,4 @@ function Card(props) {
   );
 }
 
-export default Card;
+export default memo(Card);

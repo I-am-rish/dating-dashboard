@@ -38,14 +38,14 @@ const AppHeaderDropdown = () => {
         <CDropdownHeader className="bg-light fw-semibold py-2">
           Account
         </CDropdownHeader>
-        <Link className="dropdown-item" to={"/web/profile"}>
+        {/* <Link className="dropdown-item" to={"/web/profile"}>
           {" "}
           <i className="bi bi-person-square"></i>&nbsp;Profile
-        </Link>
-        <Link className="dropdown-item" to={"/web/settings"}>
+        </Link> */}
+        {/* <Link className="dropdown-item" to={"/web/settings"}>
           {" "}
           <i className="bi bi-gear-fill"></i>&nbsp;Settings
-        </Link>
+        </Link> */}
 
         <CDropdownDivider />
         <Link className="dropdown-item" onClick={handleLogOut}>

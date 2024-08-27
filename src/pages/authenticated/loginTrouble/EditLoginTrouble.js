@@ -15,25 +15,25 @@ import AppHeader from "../../../components/AppHeader";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Button } from "@mui/material";
 
-const NewContent = () => {
+const EditLoginTrouble = () => {
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState("");
-  const [title, setTitle] = useState("");
+  const [answer, setAnswer] = useState("");
   const params = useParams();
-  const [newContent, setNewContent] = useState({});
+  const [question, setQuestion] = useState("");
   const editor = useRef(null);
 
   const navigate = useNavigate();
 
-  const newContentData = {
-    description: newContent,
-    title: title,
+  const newLoginTroubleInfo = {
+    question,
+    answer,
   };
 
-  const updateContent = (e) => {
+  const AddLoginTrouble = (e) => {
     setLoading(true);
     httpClient
-      .post(`/admin/add-content`, newContentData)
+      .patch(`/admin/update-login-trouble/${params.id}`, newLoginTroubleInfo)
       .then((res) => {
         setLoading(false);
         swal.fire({
@@ -47,6 +47,7 @@ const NewContent = () => {
       })
       .catch((err) => {
         setLoading(false);
+        console.log("res ==> ", err);
         let msg = err?.response?.data?.message;
         swal.fire({
           text: { msg },
@@ -62,6 +63,14 @@ const NewContent = () => {
     navigate("/content");
   };
 
+  useEffect(() => {
+    httpClient.get(`/admin/login-trouble/${params.id}`).then((res) => {
+      console.log("update login trouble ==> ", res);
+      setQuestion(res?.data?.result.question)
+      setAnswer(res?.data?.result.answer)
+    });
+  }, []);
+
   return (
     <>
       <AppSidebar />
@@ -72,7 +81,14 @@ const NewContent = () => {
             <div className="d-flex flex-column mb-4 w-5 ">
               <Button
                 variant="contained"
-                sx={{ mt: 0, ml: 0, mb: 4, width: "90px", backgroundColor: "orange" }}
+                // color="secondary"
+                sx={{
+                  mt: 0,
+                  ml: 0,
+                  mb: 4,
+                  width: "90px",
+                  backgroundColor: "orange",
+                }}
                 onClick={() => {
                   navigate(-1);
                 }}
@@ -80,37 +96,28 @@ const NewContent = () => {
                 <ArrowBackIcon />
                 back
               </Button>
-              <span className="w-5">Title: </span>
+              <span className="w-5">Question: </span>
               <input
                 className=""
-                value={title}
-                placeholder="title"
-                onChange={(e) => setTitle(e.target.value)}
+                value={question}
+                placeholder="write question here..."
+                onChange={(e) => setQuestion(e.target.value)}
                 style={{
                   outline: "none",
+                  padding: "2px"
                 }}
               />
             </div>
-            Description:
-            <CKEditor
-              editor={ClassicEditor}
-              data={content}
-              // onReady={editor => {
-              //     console.log('Editor is ready to use!', editor);
-              // }}
-              onChange={(event, editor) => {
-                const data = editor.getData();
-                setNewContent(data);
+            Answer:
+            <textarea
+              onChange={(e) => {
+                setAnswer(e.target.value);
               }}
-              // onBlur={(event, editor) => {
-              //     console.log('Blur.', editor);webwebweb
-              // }}
-              // onFocus={(event, editor) => {
-              //     console.log('Focus.', editor); `
-              // }}
-            />
-            <button onClick={updateContent} className="Submit">
-              Submit
+              value={answer}
+              rows={8}
+            ></textarea>
+            <button onClick={AddLoginTrouble} className="Submit">
+              Update Login Trouble
             </button>
           </div>
         </Container>
@@ -119,19 +126,19 @@ const NewContent = () => {
   );
 };
 
-export default NewContent;
+export default EditLoginTrouble;
 
 const Container = styled.div`
   /* width: 100%; */
-  min-height: 75vh;
+  /* min-height: 80vh; */
   /* height: fit-content; */
   display: flex;
   background: #fff;
   display: flex;
   flex-direction: column;
   margin: 0;
-  padding: 0px 5px;
-  box-sizing: border-box;
+  /* padding: 10px 5px; */
+  /* box-sizing: border-box; */
 
   /* .header {
     font-size: 2rem;
@@ -149,15 +156,9 @@ const Container = styled.div`
     align-self: center;
     flex-direction: column;
 
-    .ck-editor__editable {
-      min-height: 400px;
-      /* border: 1px solid #ccc; */
-      background-color: #f9f9f9;
-    }
-
-    .ck.ck-editor__editable_inline {
-      padding-left: 10px;
-      padding-right: 10px;
+    .textarea {
+      outline: "none";
+      padding: "4px 2px";
     }
   }
 

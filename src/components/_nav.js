@@ -10,6 +10,8 @@ import Diversity1Icon from "@mui/icons-material/Diversity1";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SettingsAccessibilityIcon from "@mui/icons-material/SettingsAccessibility";
+import AppSettingsAltIcon from "@mui/icons-material/AppSettingsAlt";
+import TroubleshootIcon from "@mui/icons-material/Troubleshoot";
 import Logo from "./logo.png";
 
 const _nav = [
@@ -27,21 +29,22 @@ const _nav = [
           borderRadius: "50%",
           objectFit: "cover",
           cursor: "pointer",
-          background: "transparent"
+          background: "transparent",
         }}
       />
-    ), //<i className="bi bi-speedometer"></i>,
-    //logo
-    // badge: {
-    //   color: "info",
-    //   text: "NEW",
-    // },
+    ),
   },
   {
     component: CNavItem,
     name: "User Management",
     to: "/users",
     icon: <ManageAccountsIcon />,
+  },
+  {
+    component: CNavItem,
+    name: "App Setting",
+    to: "/app-setting",
+    icon: <AppSettingsAltIcon />,
   },
   {
     component: CNavItem,
@@ -91,6 +94,18 @@ const _nav = [
     to: "/feedbacks",
     icon: <FeedbackIcon />,
   },
+  {
+    component: CNavItem,
+    name: "Login-Trouble",
+    to: "/login-trouble",
+    icon: <TroubleshootIcon />,
+  },
+  // {
+  //   component: CNavItem,
+  //   name: "Users Subscriptions ",
+  //   to: "/users-subscription",
+  //   icon: <TroubleshootIcon />,
+  // },
   {
     component: CNavItem,
     name: "Contact Us",

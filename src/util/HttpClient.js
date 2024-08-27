@@ -2,7 +2,8 @@ import axios from "axios";
 
 const httpClient = axios.create({
   // baseURL:'http://localhost:7200', // Replace this with your API base URL
-  baseURL: "http://44.195.125.80:7200", // Replace this with your API base URL
+  // baseURL: "http://44.195.125.80:7200", // Replace this with your API base URL
+  baseURL: "http://3.130.22.169", // staging server
 });
 
 // Request interceptor

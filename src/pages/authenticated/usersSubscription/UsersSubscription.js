@@ -1,19 +1,20 @@
 import React, { useEffect, useState } from "react";
-import AppSidebar from "../../components/AppSidebar";
-import AppHeader from "../../components/AppHeader";
+
 import { CCol, CContainer } from "@coreui/react";
-import PageTitle from "../common/PageTitle";
+import PageTitle from "../../common/PageTitle";
 import { DataGrid } from "@mui/x-data-grid";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton, Snackbar, Switch } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import httpClient from "../../util/HttpClient";
+import httpClient from "../../../util/HttpClient";
 import swal from "sweetalert2";
-import Loader from "../../components/loader/Loader";
+import Loader from "../../../components/loader/Loader";
 import { CardMedia } from "@mui/material";
 import styled from "styled-components";
+import AppSidebar from "../../../components/AppSidebar";
+import AppHeader from "../../../components/AppHeader";
 
-const UserData = () => {
+const UserSubscription = () => {
   const [alertMessage, setAlertMessage] = useState();
   const [apiSuccess, setApiSuccess] = useState(false);
   const [apiError, setApiError] = useState(false);
@@ -172,13 +173,14 @@ const UserData = () => {
     setLoading(true);
     httpClient
       .get(
-        `/admin/users?page=${paginationModel.page}&pageSize=${paginationModel.pageSize}&search=${keyword}`
+        `/admin/users-subscription?page=${paginationModel.page}&pageSize=${paginationModel.pageSize}&search=${keyword}`
       )
       .then((res) => {
+        console.log("subscription data ==> ", res);
         setUserCount(res.data?.result?.count);
         setLoading(false);
         setRows(
-          res.data.result.docs.map((user, index) => {
+          res.data.result.map((user, index) => {
             return {
               id: user._id,
               col1:
@@ -413,7 +415,7 @@ const UserData = () => {
   );
 };
 
-export default React.memo(UserData);
+export default React.memo(UserSubscription);
 
 const Container = styled.div`
   position: absolute;
